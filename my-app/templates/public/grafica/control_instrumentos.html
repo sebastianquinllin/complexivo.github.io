@@ -5,7 +5,7 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">Análisis por Instrumento</h2>
 
-  <!-- Selector -->
+  <!-- Selector de instrumento -->
   <form id="filtro-form" class="mb-4">
     <div class="row">
       <div class="col-md-8 offset-md-2">
@@ -20,9 +20,15 @@
     </div>
   </form>
 
+  <!-- Botón para mostrar las gráficas -->
+  <div class="row mb-5">
+    <div class="col-md-8 offset-md-2">
+      <button id="mostrarGraficas" class="btn btn-success w-100">Mostrar Gráficas</button>
+    </div>
+  </div>
+
   <!-- Gráficas separadas -->
   <div class="row g-5">
-
     <div class="col-md-6">
       <div class="card">
         <div class="card-header text-center"><b>Duración (s)</b></div>
@@ -57,23 +63,68 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-document.getElementById('instrumentoSelect').addEventListener('change', async function() {
-  const id_instrumento = this.value;
+// Variable global para almacenar las gráficas
+let graficaDuracion = null;
+let graficaAceleracion = null;
+let graficaVelocidad = null;
+let graficaGiros = null;
 
-  const response = await fetch(`/api/datos-instrumento/${id_instrumento}`);
-  const data = await response.json();
+document.getElementById('instrumentoSelect').addEventListener('change', function() {
+  selectedInstrumento = this.value;  // Obtenemos el id del instrumento seleccionado
+});
 
-  const sesiones = data.sesiones;
+document.getElementById('mostrarGraficas').addEventListener('click', async function() {
+  if (!selectedInstrumento) {
+    alert('Por favor, seleccione un instrumento primero.');
+    return;
+  }
 
-  renderGrafica('graficaDuracion', sesiones, data.duraciones, '#FF6384');
-  renderGrafica('graficaAceleracion', sesiones, data.aceleraciones, '#36A2EB');
-  renderGrafica('graficaVelocidad', sesiones, data.velocidades, '#FFCE56');
-  renderGrafica('graficaGiros', sesiones, data.giros, '#4BC0C0');
+  // Realizamos el fetch para obtener los datos de todas las sesiones del instrumento
+  const response = await fetch(`/api/datos-instrumento/${selectedInstrumento}`);
+  const data = await response.json();  // Nos aseguramos de que la API devuelva un JSON válido
+
+  console.log("Datos recibidos de la API: ", data);  // Imprime los datos recibidos para depuración
+
+  if (data && data.sesiones && data.sesiones.length > 0) {
+    // Si la respuesta tiene datos, entonces renderizamos las gráficas
+    dataGlobal = data;  // Guardamos los datos globalmente para usarlos en las gráficas
+
+    // Convertir los valores a números para las gráficas
+    const duraciones = data.duraciones.map(Number);
+    const aceleraciones = data.aceleraciones.map(Number);
+    const velocidades = data.velocidades.map(Number);
+    const giros = data.giros.map(Number);
+
+    // Destruir las gráficas previas si existen
+    if (graficaDuracion) {
+      graficaDuracion.destroy();
+    }
+    if (graficaAceleracion) {
+      graficaAceleracion.destroy();
+    }
+    if (graficaVelocidad) {
+      graficaVelocidad.destroy();
+    }
+    if (graficaGiros) {
+      graficaGiros.destroy();
+    }
+
+    // Renderizar las nuevas gráficas
+    graficaDuracion = renderGrafica('graficaDuracion', data.sesiones, duraciones, '#FF6384');
+    graficaAceleracion = renderGrafica('graficaAceleracion', data.sesiones, aceleraciones, '#36A2EB');
+    graficaVelocidad = renderGrafica('graficaVelocidad', data.sesiones, velocidades, '#FFCE56');
+    graficaGiros = renderGrafica('graficaGiros', data.sesiones, giros, '#4BC0C0');
+  } else {
+    console.error('No se encontraron datos para este instrumento.');
+    alert('No se encontraron datos para este instrumento.');
+  }
 });
 
 function renderGrafica(canvasId, labels, data, color) {
   const ctx = document.getElementById(canvasId).getContext('2d');
-  new Chart(ctx, {
+  
+  // Creamos la nueva gráfica
+  return new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
@@ -93,6 +144,7 @@ function renderGrafica(canvasId, labels, data, color) {
     }
   });
 }
+
 </script>
 
 {% endblock %}

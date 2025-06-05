@@ -265,7 +265,7 @@ def api_graficas_avanzadas(id_instrumento):
     cursor = conexion.cursor(dictionary=True)
     try:
         query = """
-            SELECT s.id_sesion, i.duracion_segundos, i.aceleracion, i.velocidad, i.giros
+            SELECT s.id_sesion, s.fecha_inicio, i.duracion_segundos, i.aceleracion, i.velocidad, i.giros
             FROM instrumentos_sesion i
             JOIN sesiones_terapia s ON i.id_sesion = s.id_sesion
             WHERE i.id_instrumento = %s AND s.fecha_inicio BETWEEN %s AND %s
@@ -274,7 +274,8 @@ def api_graficas_avanzadas(id_instrumento):
         cursor.execute(query, (id_instrumento, fecha_inicio, fecha_fin))
         resultados = cursor.fetchall()
 
-        sesiones = [f"Sesión {row['id_sesion']}" for row in resultados]
+        # Agregar ID de sesión para identificar claramente las sesiones
+        sesiones = [f"Sesión {row['id_sesion']} ({row['fecha_inicio']})" for row in resultados]
         duraciones = [row['duracion_segundos'] for row in resultados]
         aceleraciones = [row['aceleracion'] for row in resultados]
         velocidades = [row['velocidad'] for row in resultados]
@@ -287,9 +288,9 @@ def api_graficas_avanzadas(id_instrumento):
             "velocidades": velocidades,
             "giros": giros
         }
-
     finally:
         conexion.close()
+
 
 @app.route("/graficas-avanzadas")
 def graficas_avanzadas():
@@ -310,12 +311,11 @@ def api_datos_instrumento(id_instrumento):
             FROM instrumentos_sesion i
             JOIN sesiones_terapia s ON i.id_sesion = s.id_sesion
             WHERE i.id_instrumento = %s
-            ORDER BY s.fecha_inicio ASC  -- Aseguramos que se ordenen todas las sesiones
+            ORDER BY s.fecha_inicio ASC
         """
         cursor.execute(query, (id_instrumento,))
         resultados = cursor.fetchall()
 
-        # Asegúrate de que todos los campos de la sesión estén siendo retornados correctamente
         sesiones = [f"Sesión {row['id_sesion']}" for row in resultados]
         duraciones = [row['duracion_segundos'] for row in resultados]
         aceleraciones = [row['aceleracion'] for row in resultados]

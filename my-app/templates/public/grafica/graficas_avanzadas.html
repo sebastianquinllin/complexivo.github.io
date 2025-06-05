@@ -32,21 +32,61 @@
     </div>
   </form>
 
-  <!-- Gráfica -->
-  <div class="card">
-    <div class="card-header text-center">
-      <h5>Resultados</h5>
-    </div>
-    <div class="card-body">
-      <canvas id="graficaAvanzada"></canvas>
-    </div>
-  </div>
+  <!-- Gráficas separadas -->
+  <div class="row g-5">
 
+    <!-- Duración Gráfica -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Duración (s)</b></div>
+        <div class="card-body">
+          <canvas id="graficaDuracion"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aceleración Gráfica -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Aceleración</b></div>
+        <div class="card-body">
+          <canvas id="graficaAceleracion"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Velocidad Gráfica -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Velocidad</b></div>
+        <div class="card-body">
+          <canvas id="graficaVelocidad"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Giros Gráfica -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Giros</b></div>
+        <div class="card-body">
+          <canvas id="graficaGiros"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+// Variables globales para almacenar las gráficas
+let graficaDuracion = null;
+let graficaAceleracion = null;
+let graficaVelocidad = null;
+let graficaGiros = null;
+
 document.getElementById('filtro-form').addEventListener('submit', async function(e) {
   e.preventDefault();
 
@@ -63,26 +103,51 @@ document.getElementById('filtro-form').addEventListener('submit', async function
   const velocidades = data.velocidades;
   const giros = data.giros;
 
-  const ctx = document.getElementById('graficaAvanzada').getContext('2d');
-  new Chart(ctx, {
+  // Destruir las gráficas anteriores si existen
+  if (graficaDuracion) {
+    graficaDuracion.destroy();
+  }
+  if (graficaAceleracion) {
+    graficaAceleracion.destroy();
+  }
+  if (graficaVelocidad) {
+    graficaVelocidad.destroy();
+  }
+  if (graficaGiros) {
+    graficaGiros.destroy();
+  }
+
+  // Renderizar las nuevas gráficas
+  graficaDuracion = renderGrafica('graficaDuracion', sesiones, duraciones, '#FF6384');
+  graficaAceleracion = renderGrafica('graficaAceleracion', sesiones, aceleraciones, '#36A2EB');
+  graficaVelocidad = renderGrafica('graficaVelocidad', sesiones, velocidades, '#FFCE56');
+  graficaGiros = renderGrafica('graficaGiros', sesiones, giros, '#4BC0C0');
+});
+
+function renderGrafica(canvasId, labels, data, color) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  
+  // Creamos la nueva gráfica
+  return new Chart(ctx, {
     type: 'line',
     data: {
-      labels: sesiones,
-      datasets: [
-        { label: 'Duración (s)', data: duraciones, borderColor: '#FF6384', fill: false },
-        { label: 'Aceleración', data: aceleraciones, borderColor: '#36A2EB', fill: false },
-        { label: 'Velocidad', data: velocidades, borderColor: '#FFCE56', fill: false },
-        { label: 'Giros', data: giros, borderColor: '#4BC0C0', fill: false }
-      ]
+      labels: labels,
+      datasets: [{
+        label: canvasId.replace('grafica',''),
+        data: data,
+        borderColor: color,
+        backgroundColor: color + '33',
+        tension: 0.3,
+        fill: true
+      }]
     },
     options: {
       responsive: true,
-      interaction: { mode: 'index', intersect: false },
       plugins: { legend: { position: 'bottom' } },
       scales: { y: { beginAtZero: true } }
     }
   });
-});
+}
 </script>
 
 {% endblock %}
