@@ -1,0 +1,52 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Lista de Infantes{% endblock %}
+
+{% block body %}
+<div class="card content_consignaciones" style="border-radius: 0px !important">
+  <section id="respuestaFiltroMes">
+    <h2 class="text-center mt-5 mb-5">Lista de Infantes <hr /></h2>
+
+    <p class="btn btn-success" style="margin-left: 10px;">
+      <a href="{{ url_for('nuevo_infante_route') }}">
+        <span style="color: white;">Nuevo Infante</span>
+      </a>
+    </p>
+
+    {% if infantes %}
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr style="background-color: #ddd">
+            <th>Nombre</th>
+            <th>Género</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Padre</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for infante in infantes %}
+          <tr>
+            <td>{{ infante.nombre }}</td>
+            <td>{{ infante.genero }}</td>
+            <td>{{ infante.fecha_nacimiento }}</td>
+            <td>{{ infante.padre }}</td>
+            <td>
+              <a href="/infantes/eliminar/{{ infante.id_infante }}" class="btn btn-danger btn-sm">
+                <i class="bi bi-trash3"></i> Eliminar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center">
+      <h4>No existen infantes registrados 😭</h4>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

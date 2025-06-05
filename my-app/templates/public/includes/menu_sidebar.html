@@ -1,0 +1,113 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+  <div class="app-brand demo">
+    <a href="{{ url_for('inicio') }}" class="app-brand-link">
+      <span class="app-brand-logo demo">
+        <img src="{{ url_for('static', filename ='assets/img/logo.png') }}" alt="Logo" />
+      </span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+      <i class="bx bx-chevron-left bx-sm align-middle"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  <ul class="menu-inner py-5">
+
+    <!-- Admin -->
+    {% if dataLogin.rol == 1 %}
+    
+    <!-- Gestión de Usuarios -->
+    <li class="menu-item {% if request.path == '/lista-de-usuarios' %} active {% endif %}">
+      <a href="/lista-de-usuarios" class="menu-link">
+        <i class="menu-icon bi bi-person-lines-fill"></i>
+        <div>Usuarios</div>
+      </a>
+    </li>
+
+    <!-- Gestión de Infantes -->
+    <li class="menu-item {% if request.path == '/infantes' %} active {% endif %}">
+      <a href="/infantes" class="menu-link">
+        <i class="menu-icon bi bi-emoji-smile"></i>
+        <div>Infantes</div>
+      </a>
+    </li>
+
+    <!-- Gestión de Sesiones -->
+    <li class="menu-item {% if request.path == '/sesiones' %} active {% endif %}">
+      <a href="/sesiones" class="menu-link">
+        <i class="menu-icon bi bi-calendar-check"></i>
+        <div>Sesiones</div>
+      </a>
+    </li>
+
+    <!-- Control en Tiempo Real -->
+    <li class="menu-item {% if request.path.startswith('/sesion/control') %} active {% endif %}">
+      <a href="/sesiones" class="menu-link">
+        <i class="menu-icon bi bi-sliders"></i>
+        <div>Control en Vivo</div>
+      </a>
+    </li>
+
+    <!-- NUEVO Control de Instrumentos -->
+    <li class="menu-item {% if request.path == '/control-instrumentos' %} active {% endif %}">
+      <a href="/control-instrumentos" class="menu-link">
+        <i class="menu-icon bi bi-cpu"></i>
+        <div>Control Instrumentos</div>
+      </a>
+    </li>
+
+    <!-- Reporte de Actividad -->
+    <li class="menu-item {% if request.path == '/reporte-log-actividad' %} active {% endif %}">
+      <a href="/reporte-log-actividad" class="menu-link">
+        <i class="menu-icon bi bi-file-earmark-text"></i>
+        <div>Reporte de Actividad</div>
+      </a>
+    </li>
+
+    <!-- Gráficas -->
+    <li class="menu-item {% if request.path == '/lista-de-graficas' %} active {% endif %}">
+      <a href="/lista-de-graficas" class="menu-link">
+        <i class="menu-icon bi bi-bar-chart-line"></i>
+        <div>Gráficas</div>
+      </a>
+    </li>
+
+    <!-- NUEVAS Gráficas Avanzadas -->
+    <li class="menu-item {% if request.path == '/graficas-avanzadas' %} active {% endif %}">
+      <a href="/graficas-avanzadas" class="menu-link">
+        <i class="menu-icon bi bi-graph-up-arrow"></i>
+        <div>Gráficas Avanzadas</div>
+      </a>
+    </li>
+
+    {% endif %}
+
+    <!-- Padre -->
+    {% if dataLogin.rol == 2 %}
+    <li class="menu-item {% if request.path == '/infantes' %} active {% endif %}">
+      <a href="/infantes" class="menu-link">
+        <i class="menu-icon bi bi-emoji-smile"></i>
+        <div>Mis Hijos</div>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- Todos los roles: Perfil y Logout -->
+    <li class="menu-item {% if request.path == '/mi-perfil/' ~ dataLogin.id %} active {% endif %}">
+      <a href="/mi-perfil/{{ dataLogin.id }}" class="menu-link">
+        <i class="menu-icon bi bi-person-fill-gear"></i>
+        <div>Mi Perfil</div>
+      </a>
+    </li>
+
+    <li class="menu-item">
+      <a href="{{ url_for('cerraSesion') }}" class="menu-link">
+        <i class="menu-icon bi bi-box-arrow-right"></i>
+        <div>Salir</div>
+      </a>
+    </li>
+
+  </ul>
+</aside>

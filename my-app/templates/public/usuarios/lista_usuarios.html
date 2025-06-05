@@ -1,0 +1,73 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Lista de Usuarios{% endblock %}
+
+{% block body %}
+
+<div class="card content_consignaciones" style="border-radius: 0px !important">
+  <section id="respuestaFiltroMes">
+    <h2 class="text-center mt-5 mb-5">
+      Lista de Usuarios
+      <hr />
+    </h2>
+
+    <p class="btn btn-success" style="margin-left: 10px;">
+      <a href="{{ url_for('register_user_form') }}">
+        <span style="color: white;">Nuevo Usuario</span>
+      </a>
+    </p>
+
+    {% if resp_usuariosBD %}
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr style="background-color: #ddd">
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for usuario in resp_usuariosBD %}
+          <tr>
+            <td>{{ usuario.cedula }}</td>
+            <td>{{ usuario.nombre_usuario }} {{ usuario.apellido_usuario }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.nombre_rol }}</td>
+            <td>
+              <a href="/mi-perfil/{{ usuario.id_usuario }}" class="btn btn-success btn-sm" tooltip="Actualizar Registro">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+              </a>
+              <a href="javascript:void(0);" onclick="eliminarUsuario('{{ usuario.id_usuario }}');"
+                 class="btn btn-danger btn-sm"
+                 data-bs-toggle="tooltip"
+                 title="Eliminar a {{ usuario.nombre_usuario }}">
+                 <i class="bi bi-trash3"></i> Eliminar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center">
+      <h4>No existen usuarios registrados 😭</h4>
+    </div>
+    {% endif %}
+  </section>
+</div>
+
+{% endblock %}
+
+{% block customJS %}
+<script>
+  function eliminarUsuario(id) {
+    if (confirm("¿Estas seguro que deseas eliminar el Usuario?")) {
+      window.location.href = `/borrar-usuario/${id}`;
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'public/base_cpanel.html' %}
+{% block title %}Control de Instrumentos{% endblock %}
+{% block body %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Análisis por Instrumento</h2>
+
+  <!-- Selector -->
+  <form id="filtro-form" class="mb-4">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <label for="instrumentoSelect" class="form-label">Seleccione el Instrumento:</label>
+        <select id="instrumentoSelect" class="form-select">
+          <option value="" disabled selected>Seleccione un instrumento</option>
+          {% for instrumento in instrumentos %}
+          <option value="{{ instrumento.id_instrumento }}">{{ instrumento.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <!-- Gráficas separadas -->
+  <div class="row g-5">
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Duración (s)</b></div>
+        <div class="card-body"><canvas id="graficaDuracion"></canvas></div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Aceleración</b></div>
+        <div class="card-body"><canvas id="graficaAceleracion"></canvas></div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Velocidad</b></div>
+        <div class="card-body"><canvas id="graficaVelocidad"></canvas></div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center"><b>Giros</b></div>
+        <div class="card-body"><canvas id="graficaGiros"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.getElementById('instrumentoSelect').addEventListener('change', async function() {
+  const id_instrumento = this.value;
+
+  const response = await fetch(`/api/datos-instrumento/${id_instrumento}`);
+  const data = await response.json();
+
+  const sesiones = data.sesiones;
+
+  renderGrafica('graficaDuracion', sesiones, data.duraciones, '#FF6384');
+  renderGrafica('graficaAceleracion', sesiones, data.aceleraciones, '#36A2EB');
+  renderGrafica('graficaVelocidad', sesiones, data.velocidades, '#FFCE56');
+  renderGrafica('graficaGiros', sesiones, data.giros, '#4BC0C0');
+});
+
+function renderGrafica(canvasId, labels, data, color) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: canvasId.replace('grafica',''),
+        data: data,
+        borderColor: color,
+        backgroundColor: color + '33',
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+</script>
+
+{% endblock %}

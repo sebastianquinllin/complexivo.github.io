@@ -1,0 +1,102 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Panel de Control | Gráficas{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <h2 class="text-center mb-5">Gráficas del Sistema</h2>
+
+  <!-- Gráfico de Roles -->
+  <div class="row mb-5">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header text-center">
+          <h5>Distribución de Roles</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="graficaRoles"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de KPIs -->
+  <div class="row mb-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header text-center">
+          <h5>Resumen General del Sistema</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="graficaKPIs"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cargar Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Declaramos los colores solo una vez como variable global
+const coloresGlobales = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+
+document.addEventListener('DOMContentLoaded', function () {
+  renderGraficaRoles();
+  renderGraficaKPIs();
+});
+
+function renderGraficaRoles() {
+  const ctx = document.getElementById('graficaRoles').getContext('2d');
+  const nombres = {{ nombres_roles | tojson | safe }};
+  const cantidades = {{ cantidad_por_rol | tojson | safe }};
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: nombres,
+      datasets: [{
+        data: cantidades,
+        backgroundColor: coloresGlobales,
+        borderColor: 'rgba(0,0,0,0.2)',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+}
+
+function renderGraficaKPIs() {
+  const ctx = document.getElementById('graficaKPIs').getContext('2d');
+  const etiquetas = ['Infantes', 'Terapias', 'Sesiones', 'Instrumentos'];
+  const valores = [
+    {{ total_infantes }},
+    {{ total_terapias }},
+    {{ total_sesiones }},
+    {{ total_instrumentos }}
+  ];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: 'Totales',
+        data: valores,
+        backgroundColor: coloresGlobales,
+        borderColor: coloresGlobales.map(color => color.replace('0.5', '1')),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+</script>
+{% endblock %}

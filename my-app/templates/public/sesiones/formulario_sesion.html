@@ -1,0 +1,49 @@
+{% extends 'public/base_cpanel.html' %}
+{% block title %}Nueva Sesión{% endblock %}
+{% block body %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Iniciar Nueva Sesión</h2>
+
+  <form method="post">
+
+    <!-- Infante -->
+    <div class="mb-3">
+      <label for="id_infante">Infante</label>
+      <select name="id_infante" class="form-select" required>
+        <option value="" disabled selected>Seleccione un infante</option>
+        {% for infante in infantes %}
+        <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Terapia -->
+    <div class="mb-3">
+      <label for="id_terapia">Terapia</label>
+      <select name="id_terapia" class="form-select" required>
+        <option value="" disabled selected>Seleccione una terapia</option>
+        {% for terapia in terapias %}
+        <option value="{{ terapia.id_terapia }}">{{ terapia.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Terapeuta -->
+    <div class="mb-3">
+      <label for="id_terapeuta">Terapeuta</label>
+      <select name="id_terapeuta" class="form-select" required>
+        <option value="" disabled selected>Seleccione un terapeuta</option>
+        {% for terapeuta in terapeutas %}
+        <option value="{{ terapeuta.id_usuario }}">{{ terapeuta.nombre_usuario }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+    <a href="{{ url_for('listar_sesiones_route') }}" class="btn btn-secondary">Cancelar</a>
+
+  </form>
+</div>
+
+{% endblock %}

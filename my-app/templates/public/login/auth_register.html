@@ -1,0 +1,82 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Registrar Usuario{% endblock %}
+
+{% block body %}
+<div class="container-xxl">
+  <div class="authentication-wrapper authentication-basic container-p-y">
+    <div class="authentication-inner">
+      <div class="card">
+        <div class="card-body">
+          <div class="app-brand justify-content-center">
+            <div class="col-md-12">
+              <h3 class="text-center mt-5 mb-3">REGISTRAR USUARIO</h3>
+              <hr />
+            </div>
+          </div>
+
+          <form class="mb-3" action="{{ url_for('saved_register') }}" method="POST">
+
+            <!-- Cédula -->
+            <div class="mb-3">
+              <label for="cedula" class="form-label">Cédula</label>
+              <input type="text" class="form-control" name="cedula" required autofocus />
+            </div>
+
+            <!-- Nombre y Apellido -->
+            <div class="row">
+              <div class="mb-3 col-md-6">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" name="name" required autofocus />
+              </div>
+              <div class="mb-3 col-md-6">
+                <label for="surname" class="form-label">Apellido</label>
+                <input type="text" class="form-control" name="surname" required autofocus />
+              </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" name="correo" required autofocus />
+            </div>
+
+            <!-- Rol -->
+            <div class="mb-3">
+              <label for="rol" class="form-label">Rol</label>
+              <select class="form-select" name="selectRol" required>
+                <option value="" disabled selected>Seleccione un rol</option>
+                {% for rol in roles %}
+                <option value="{{ rol.id_rol }}">{{ rol.nombre_rol }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Clave -->
+            <div class="mb-3 form-password-toggle">
+              <label class="form-label" for="pass_user">Clave</label>
+              <div class="input-group input-group-merge">
+                <input type="password" class="form-control" name="pass_user" id="pass_user" placeholder="********" required />
+                <span class="input-group-text cursor-pointer">
+                  <i class="bx bx-hide"></i>
+                </span>
+              </div>
+            </div>
+
+            <button class="btn btn-primary w-100">
+              Crear cuenta <i class="bi bi-arrow-right-circle"></i>
+            </button>
+          </form>
+
+          <div class="text-center mt-3">
+            <a href="{{ url_for('usuarios') }}" class="d-flex align-items-center justify-content-center">
+              <i class="bx bx-chevron-left scaleX-n1-rtl bx-sm"></i> Volver
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

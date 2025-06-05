@@ -1,0 +1,50 @@
+{% extends 'public/base_cpanel.html' %}
+{% block title %}Sesiones{% endblock %}
+{% block body %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Listado de Sesiones</h2>
+
+  <a href="{{ url_for('nueva_sesion_route') }}" class="btn btn-primary mb-3">Nueva Sesión</a>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>ID Sesión</th>
+        <th>Infante</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sesion in sesiones %}
+      <tr>
+        <td>{{ sesion.id_sesion }}</td>
+        <td>{{ sesion.infante }}</td>
+        <td>{{ sesion.fecha_inicio }}</td>
+        <td>{{ sesion.fecha_fin or 'En progreso' }}</td>
+        <td>
+          {% if sesion.cerrada %}
+            <span class="badge bg-success">Finalizada</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">En Progreso</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if not sesion.cerrada %}
+            <a href="{{ url_for('finalizar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-success btn-sm">Finalizar</a>
+            <a href="{{ url_for('control_sesion', id_sesion=sesion.id_sesion) }}" class="btn btn-secondary btn-sm">Control</a>
+          {% else %}
+            <span class="text-muted">--</span>
+          {% endif %}
+          <a href="{{ url_for('eliminar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

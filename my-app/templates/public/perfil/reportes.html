@@ -1,0 +1,51 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Reportes de Actividad{% endblock %}
+
+{% block body %}
+<div class="card">
+  <div class="row">
+    <div class="col-md-12 mb-4">
+      <h3 class="text-center mt-5 mb-3">Reporte de Actividad</h3>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-3">
+    <div class="col-md-auto align-self-center">
+      <a href="/descargar-reporte-log" class="btn btn-success btn-sm" tooltip="Reporte de actividad">
+        <i class="bi bi-arrow-clockwise"></i> Descargar Reporte
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr style="background-color: #ddd">
+            <th>ID Log</th>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Acción</th>
+            <th>Tabla Afectada</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reporte in reportes %}
+          <tr>
+            <td>{{ reporte.id_log }}</td>
+            <td>{{ reporte.nombre_usuario }}</td>
+            <td>{{ reporte.correo }}</td>
+            <td>{{ reporte.accion }}</td>
+            <td>{{ reporte.tabla_afectada }}</td>
+            <td>{{ reporte.fecha }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

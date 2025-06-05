@@ -1,0 +1,73 @@
+{% extends 'public/base_cpanel.html' %}
+{% block title %}Control en Tiempo Real{% endblock %}
+{% block body %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Control Multisensorial de Instrumentos</h2>
+
+  <div class="row gy-5 gx-4">
+    {% for instrumento in instrumentos %}
+    <div class="col-md-6">
+      <div class="card shadow-lg rounded-4">
+        <div class="card-header text-center fs-5 fw-bold bg-primary text-white rounded-top-4">
+          {{ instrumento.nombre }}
+        </div>
+
+        <div class="card-body p-4">
+
+          <!-- Power principal -->
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input switch-instrumento" type="checkbox"
+              id="power{{ instrumento.id_instrumento }}" data-id="{{ instrumento.id_instrumento }}"
+              {% if instrumento.estado %}checked{% endif %}>
+            <label class="form-check-label fs-6" for="power{{ instrumento.id_instrumento }}">
+              🔌 Encendido
+            </label>
+          </div>
+
+          <!-- LED -->
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input led-instrumento" type="checkbox"
+              id="led{{ instrumento.id_instrumento }}" data-id="{{ instrumento.id_instrumento }}">
+            <label class="form-check-label fs-6" for="led{{ instrumento.id_instrumento }}">
+              💡 Luces LED
+            </label>
+          </div>
+
+          <!-- Música en uso -->
+          <div class="mb-3">
+            <label class="form-label fs-6">🎵 Música en Uso:</label>
+            <select class="form-select musica-uso" data-id="{{ instrumento.id_instrumento }}">
+              <option value="ninguna">Ninguna</option>
+              <option value="cancion1">Canción 1</option>
+              <option value="cancion2">Canción 2</option>
+              <option value="cancion3">Canción 3</option>
+            </select>
+          </div>
+
+          <!-- Música en reposo -->
+          <div class="mb-3">
+            <label class="form-label fs-6">🎶 Música en Reposo:</label>
+            <select class="form-select musica-reposo" data-id="{{ instrumento.id_instrumento }}">
+              <option value="ninguna">Ninguna</option>
+              <option value="cancion1">Canción 1</option>
+              <option value="cancion2">Canción 2</option>
+              <option value="cancion3">Canción 3</option>
+            </select>
+          </div>
+
+          <!-- Volumen -->
+          <div class="mb-3">
+            <label class="form-label fs-6">🔊 Volumen:</label>
+            <input type="range" class="form-range volumen-control" min="0" max="100" value="50"
+              data-id="{{ instrumento.id_instrumento }}">
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

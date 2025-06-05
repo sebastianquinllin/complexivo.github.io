@@ -1,0 +1,88 @@
+{% extends 'public/base_cpanel.html' %}
+{% block title %}Gráficas Avanzadas{% endblock %}
+{% block body %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Análisis Avanzado de Instrumentos</h2>
+
+  <!-- Formulario de filtro -->
+  <form id="filtro-form" class="row g-3 mb-5">
+    <div class="col-md-4">
+      <label for="instrumento" class="form-label">Instrumento:</label>
+      <select id="instrumento" name="instrumento" class="form-select" required>
+        <option value="" disabled selected>Seleccione Instrumento</option>
+        {% for instrumento in instrumentos %}
+        <option value="{{ instrumento.id_instrumento }}">{{ instrumento.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
+      <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" required>
+    </div>
+
+    <div class="col-md-3">
+      <label for="fecha_fin" class="form-label">Fecha Fin:</label>
+      <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" required>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+  </form>
+
+  <!-- Gráfica -->
+  <div class="card">
+    <div class="card-header text-center">
+      <h5>Resultados</h5>
+    </div>
+    <div class="card-body">
+      <canvas id="graficaAvanzada"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.getElementById('filtro-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const id_instrumento = document.getElementById('instrumento').value;
+  const fecha_inicio = document.getElementById('fecha_inicio').value;
+  const fecha_fin = document.getElementById('fecha_fin').value;
+
+  const response = await fetch(`/api/graficas-avanzadas/${id_instrumento}?inicio=${fecha_inicio}&fin=${fecha_fin}`);
+  const data = await response.json();
+
+  const sesiones = data.sesiones;
+  const duraciones = data.duraciones;
+  const aceleraciones = data.aceleraciones;
+  const velocidades = data.velocidades;
+  const giros = data.giros;
+
+  const ctx = document.getElementById('graficaAvanzada').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sesiones,
+      datasets: [
+        { label: 'Duración (s)', data: duraciones, borderColor: '#FF6384', fill: false },
+        { label: 'Aceleración', data: aceleraciones, borderColor: '#36A2EB', fill: false },
+        { label: 'Velocidad', data: velocidades, borderColor: '#FFCE56', fill: false },
+        { label: 'Giros', data: giros, borderColor: '#4BC0C0', fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+});
+</script>
+
+{% endblock %}

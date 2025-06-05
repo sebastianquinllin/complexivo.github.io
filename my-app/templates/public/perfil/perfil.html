@@ -1,0 +1,93 @@
+{% extends 'public/base_cpanel.html' %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block body %}
+<div class="card" style="border-radius: 0px !important">
+  <div class="row justify-content-center mb-2">
+    <div class="col-md-12">
+      <h3 class="text-center mt-5 mb-3">MI PERFIL</h3>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row justify-content-center mb-2">
+    <div class="col-md-6">
+      <form class="form-horizontal mx-auto" method="POST" action="{{ url_for('actualizarPerfil', id=info_perfil_session['id_usuario']) }}">
+        <div class="card-body">
+          <!-- Cédula -->
+          <div class="mb-3">
+            <label for="cedula" class="form-label">Cédula</label>
+            <input class="form-control" type="text" name="cedula" value="{{ info_perfil_session['cedula'] }}" readonly />
+          </div>
+
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" name="name" value="{{ info_perfil_session['nombre_usuario'] }}" class="form-control" required />
+          </div>
+
+          <!-- Apellido -->
+          <div class="mb-3">
+            <label for="surname" class="form-label">Apellido</label>
+            <input class="form-control" type="text" name="surname" value="{{ info_perfil_session['apellido_usuario'] }}" required />
+          </div>
+
+          <!-- Correo -->
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo Electrónico</label>
+            <input class="form-control" type="email" name="correo" value="{{ info_perfil_session['correo'] }}" required />
+          </div>
+
+          <!-- Rol -->
+          <div class="mb-3">
+            <label for="rol" class="form-label">Rol</label>
+            <select class="form-select" name="selectRol" {% if dataLogin.rol != 1 %} disabled {% endif %}>
+              {% for rol in roles %}
+              <option value="{{ rol.id_rol }}" {% if rol.id_rol == info_perfil_session['id_rol'] %} selected {% endif %}>
+                {{ rol.nombre_rol }}
+              </option>
+              {% endfor %}
+            </select>
+            {% if dataLogin.rol != 1 %}
+            <input type="hidden" name="selectRol" value="{{ info_perfil_session['id_rol'] }}">
+            {% endif %}
+          </div>
+
+          <!-- Campos de cambio de contraseña (solo si es el mismo usuario) -->
+          {% if dataLogin.id == info_perfil_session['id_usuario'] %}
+          <div class="mb-3 form-password-toggle mt-3">
+            <label class="form-label" for="pass_actual">Clave Actual</label>
+            <div class="input-group input-group-merge">
+              <input type="password" class="form-control" name="pass_actual" id="pass_actual" placeholder="********" />
+              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+            </div>
+          </div>
+
+          <div class="mb-3 form-password-toggle">
+            <label class="form-label" for="new_pass_user">Nueva Clave</label>
+            <div class="input-group input-group-merge">
+              <input type="password" class="form-control" name="new_pass_user" id="new_pass_user" placeholder="********" />
+              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+            </div>
+          </div>
+
+          <div class="mb-3 form-password-toggle">
+            <label class="form-label" for="repetir_pass_user">Repetir Nueva Clave</label>
+            <div class="input-group input-group-merge">
+              <input type="password" class="form-control" name="repetir_pass_user" id="repetir_pass_user" placeholder="********" />
+              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Botón -->
+        <div class="mb-3 text-center">
+          <button type="submit" class="btn rounded-pill btn-primary">Actualizar mis datos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
