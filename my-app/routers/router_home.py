@@ -142,6 +142,10 @@ def lista_de_graficas():
     if 'id' in session:
         dataLogin = dataLoginSesion()
 
+        # Obtener los KPIs (actualizados, ahora devuelve 3 valores)
+        total_infantes, total_sesiones, total_instrumentos = obtener_kpis_dashboard()
+
+        # Obtener los roles y la cantidad de usuarios por rol
         roles = obtener_roles()
         nombres_roles, cantidad_por_rol = [], []
 
@@ -151,16 +155,17 @@ def lista_de_graficas():
             nombres_roles.append(rol['nombre_rol'])
             cantidad_por_rol.append(cantidad)
 
-        total_infantes, total_terapias, total_sesiones, total_instrumentos = obtener_kpis_dashboard()
+        # Obtener los instrumentos
+        instrumentos = obtener_instrumentos()
 
         return render_template('public/grafica/lista_graficas.html',
-                                dataLogin=dataLogin,
-                                nombres_roles=nombres_roles,
-                                cantidad_por_rol=cantidad_por_rol,
-                                total_infantes=total_infantes,
-                                total_terapias=total_terapias,
-                                total_sesiones=total_sesiones,
-                                total_instrumentos=total_instrumentos)
+                               dataLogin=dataLogin,
+                               nombres_roles=nombres_roles,
+                               cantidad_por_rol=cantidad_por_rol,
+                               total_infantes=total_infantes,
+                               total_sesiones=total_sesiones,
+                               total_instrumentos=total_instrumentos,
+                               instrumentos=instrumentos)  # Asegúrate de que estamos pasando instrumentos al template
     else:
         flash('Primero debes iniciar sesión.', 'error')
         return redirect(url_for('inicio'))
@@ -182,20 +187,38 @@ def listar_sesiones_route():
 def nueva_sesion_route():
     if 'id' in session:
         dataLogin = dataLoginSesion()
-        if request.method == 'POST':
-            id_infante = request.form['id_infante']
-            id_terapia = request.form['id_terapia']
-            id_terapeuta = request.form['id_terapeuta']
-            crear_sesion(id_infante, id_terapia, id_terapeuta)
-            flash('Sesión creada e iniciada.', 'success')
-            return redirect(url_for('listar_sesiones_route'))
 
+        # Validar si hay alguna sesión activa
+        conexion = obtener_conexion()
+        cursor = conexion.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT id_sesion FROM sesiones_terapia WHERE cerrada = FALSE LIMIT 1")
+            sesion_activa = cursor.fetchone()
+            if sesion_activa:
+                flash('Ya hay una sesión activa. Solo se puede tener una sesión activa a la vez.', 'error')
+                return redirect(url_for('listar_sesiones_route'))
+
+            if request.method == 'POST':
+                id_infante = request.form['id_infante']
+                id_terapeuta = request.form['id_terapeuta']  # Aquí puede haber un campo adicional
+
+                cursor.execute("""
+                    INSERT INTO sesiones_terapia (id_infante, id_terapeuta, fecha_inicio)
+                    VALUES (%s, %s, NOW())
+                """, (id_infante, id_terapeuta))
+                conexion.commit()
+
+                flash('Sesión creada e iniciada.', 'success')
+                return redirect(url_for('listar_sesiones_route'))
+        finally:
+            conexion.close()
+
+        # Obtener los infantes y terapeutas para el formulario
         infantes = obtener_infantes()
-        terapias = obtener_terapias()
         terapeutas = obtener_terapeutas()
 
         return render_template('public/sesiones/formulario_sesion.html',
-                                infantes=infantes, terapias=terapias, terapeutas=terapeutas, dataLogin=dataLogin)
+                               infantes=infantes, terapeutas=terapeutas, dataLogin=dataLogin)
     else:
         return redirect(url_for('inicio'))
 
@@ -250,49 +273,14 @@ def actualizar_instrumento_estado():
 def control_instrumentos():
     if 'id' in session:
         dataLogin = dataLoginSesion()
-        instrumentos = obtener_instrumentos()  # Esta función debería existir para traer todos los instrumentos.
+        instrumentos = obtener_instrumentos()  # Esta función trae todos los instrumentos disponibles
+        infantes = obtener_infantes()  # Traemos los infantes para el select
         return render_template('public/grafica/control_instrumentos.html',
-                                instrumentos=instrumentos, dataLogin=dataLogin)
+                                instrumentos=instrumentos, infantes=infantes, dataLogin=dataLogin)
     else:
         return redirect(url_for('inicio'))
-    
-@app.route("/api/graficas-avanzadas/<int:id_instrumento>")
-def api_graficas_avanzadas(id_instrumento):
-    fecha_inicio = request.args.get('inicio')
-    fecha_fin = request.args.get('fin')
 
-    conexion = obtener_conexion()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        query = """
-            SELECT s.id_sesion, s.fecha_inicio, i.duracion_segundos, i.aceleracion, i.velocidad, i.giros
-            FROM instrumentos_sesion i
-            JOIN sesiones_terapia s ON i.id_sesion = s.id_sesion
-            WHERE i.id_instrumento = %s AND s.fecha_inicio BETWEEN %s AND %s
-            ORDER BY s.fecha_inicio
-        """
-        cursor.execute(query, (id_instrumento, fecha_inicio, fecha_fin))
-        resultados = cursor.fetchall()
-
-        # Agregar ID de sesión para identificar claramente las sesiones
-        sesiones = [f"Sesión {row['id_sesion']} ({row['fecha_inicio']})" for row in resultados]
-        duraciones = [row['duracion_segundos'] for row in resultados]
-        aceleraciones = [row['aceleracion'] for row in resultados]
-        velocidades = [row['velocidad'] for row in resultados]
-        giros = [row['giros'] for row in resultados]
-
-        return {
-            "sesiones": sesiones,
-            "duraciones": duraciones,
-            "aceleraciones": aceleraciones,
-            "velocidades": velocidades,
-            "giros": giros
-        }
-    finally:
-        conexion.close()
-
-
-@app.route("/graficas-avanzadas")
+@app.route("/graficas-avanzadas", methods=['GET'])
 def graficas_avanzadas():
     if 'id' in session:
         dataLogin = dataLoginSesion()
@@ -300,82 +288,5 @@ def graficas_avanzadas():
         return render_template('public/grafica/graficas_avanzadas.html', instrumentos=instrumentos, dataLogin=dataLogin)
     else:
         return redirect(url_for('inicio'))
+    
 
-@app.route("/api/datos-instrumento/<int:id_instrumento>")
-def api_datos_instrumento(id_instrumento):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        query = """
-            SELECT s.id_sesion, i.duracion_segundos, i.aceleracion, i.velocidad, i.giros
-            FROM instrumentos_sesion i
-            JOIN sesiones_terapia s ON i.id_sesion = s.id_sesion
-            WHERE i.id_instrumento = %s
-            ORDER BY s.fecha_inicio ASC
-        """
-        cursor.execute(query, (id_instrumento,))
-        resultados = cursor.fetchall()
-
-        sesiones = [f"Sesión {row['id_sesion']}" for row in resultados]
-        duraciones = [row['duracion_segundos'] for row in resultados]
-        aceleraciones = [row['aceleracion'] for row in resultados]
-        velocidades = [row['velocidad'] for row in resultados]
-        giros = [row['giros'] for row in resultados]
-
-        return {
-            "sesiones": sesiones,
-            "duraciones": duraciones,
-            "aceleraciones": aceleraciones,
-            "velocidades": velocidades,
-            "giros": giros
-        }
-    finally:
-        conexion.close()
-
-# ------------------------ CONTROL LED ------------------------ #
-@app.route("/control-led", methods=['POST'])
-def control_led():
-    if 'id' in session:
-        id_instrumento = request.form['id_instrumento']
-        led = request.form['led']
-        topic = f"instrumento/{id_instrumento}/led"
-        publicar_mensaje_custom(topic, led)
-        return {"status": "ok"}
-    else:
-        return {"status": "unauthorized"}, 401
-
-# ------------------------ CONTROL MÚSICA USO ------------------------ #
-@app.route("/control-musica-uso", methods=['POST'])
-def control_musica_uso():
-    if 'id' in session:
-        id_instrumento = request.form['id_instrumento']
-        musica = request.form['musica']
-        topic = f"instrumento/{id_instrumento}/musica/uso"
-        publicar_mensaje_custom(topic, musica)
-        return {"status": "ok"}
-    else:
-        return {"status": "unauthorized"}, 401
-
-# ------------------------ CONTROL MÚSICA REPOSO ------------------------ #
-@app.route("/control-musica-reposo", methods=['POST'])
-def control_musica_reposo():
-    if 'id' in session:
-        id_instrumento = request.form['id_instrumento']
-        musica = request.form['musica']
-        topic = f"instrumento/{id_instrumento}/musica/reposo"
-        publicar_mensaje_custom(topic, musica)
-        return {"status": "ok"}
-    else:
-        return {"status": "unauthorized"}, 401
-
-# ------------------------ CONTROL VOLUMEN ------------------------ #
-@app.route("/control-volumen", methods=['POST'])
-def control_volumen():
-    if 'id' in session:
-        id_instrumento = request.form['id_instrumento']
-        volumen = request.form['volumen']
-        topic = f"instrumento/{id_instrumento}/volumen"
-        publicar_mensaje_custom(topic, volumen)
-        return {"status": "ok"}
-    else:
-        return {"status": "unauthorized"}, 401

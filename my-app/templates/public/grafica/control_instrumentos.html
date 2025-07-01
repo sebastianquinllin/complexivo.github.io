@@ -3,12 +3,12 @@
 {% block body %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Análisis por Instrumento</h2>
+  <h2 class="text-center mb-4">Análisis por Instrumento y Infante</h2>
 
-  <!-- Selector de instrumento -->
+  <!-- Formulario de filtro -->
   <form id="filtro-form" class="mb-4">
     <div class="row">
-      <div class="col-md-8 offset-md-2">
+      <div class="col-md-4">
         <label for="instrumentoSelect" class="form-label">Seleccione el Instrumento:</label>
         <select id="instrumentoSelect" class="form-select">
           <option value="" disabled selected>Seleccione un instrumento</option>
@@ -17,18 +17,26 @@
           {% endfor %}
         </select>
       </div>
+
+      <div class="col-md-4">
+        <label for="infanteSelect" class="form-label">Seleccione el Infante:</label>
+        <select id="infanteSelect" class="form-select">
+          <option value="" disabled selected>Seleccione un infante</option>
+          {% for infante in infantes %}
+          <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+      </div>
     </div>
   </form>
 
-  <!-- Botón para mostrar las gráficas -->
-  <div class="row mb-5">
-    <div class="col-md-8 offset-md-2">
-      <button id="mostrarGraficas" class="btn btn-success w-100">Mostrar Gráficas</button>
-    </div>
-  </div>
-
   <!-- Gráficas separadas -->
   <div class="row g-5">
+
     <div class="col-md-6">
       <div class="card">
         <div class="card-header text-center"><b>Duración (s)</b></div>
@@ -63,68 +71,50 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Variable global para almacenar las gráficas
-let graficaDuracion = null;
-let graficaAceleracion = null;
-let graficaVelocidad = null;
-let graficaGiros = null;
+// Función principal para actualizar las gráficas cuando se cambia de instrumento y infante
+document.getElementById('filtro-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-document.getElementById('instrumentoSelect').addEventListener('change', function() {
-  selectedInstrumento = this.value;  // Obtenemos el id del instrumento seleccionado
-});
+  const id_instrumento = document.getElementById('instrumentoSelect').value;
+  const id_infante = document.getElementById('infanteSelect').value;
 
-document.getElementById('mostrarGraficas').addEventListener('click', async function() {
-  if (!selectedInstrumento) {
-    alert('Por favor, seleccione un instrumento primero.');
+  // Validación para asegurar que ambos filtros estén seleccionados
+  if (!id_instrumento || !id_infante) {
+    alert('Por favor, seleccione tanto el instrumento como el infante.');
     return;
   }
 
-  // Realizamos el fetch para obtener los datos de todas las sesiones del instrumento
-  const response = await fetch(`/api/datos-instrumento/${selectedInstrumento}`);
-  const data = await response.json();  // Nos aseguramos de que la API devuelva un JSON válido
+  // Realizamos el fetch para obtener los datos de todas las sesiones del instrumento e infante seleccionado
+  const response = await fetch(`/api/datos-instrumento-infante/${id_instrumento}/${id_infante}`);
+  const data = await response.json();
 
-  console.log("Datos recibidos de la API: ", data);  // Imprime los datos recibidos para depuración
+  const sesiones = data.sesiones;
+  const duraciones = data.duraciones;
+  const aceleraciones = data.aceleraciones;
+  const velocidades = data.velocidades;
+  const giros = data.giros;
 
-  if (data && data.sesiones && data.sesiones.length > 0) {
-    // Si la respuesta tiene datos, entonces renderizamos las gráficas
-    dataGlobal = data;  // Guardamos los datos globalmente para usarlos en las gráficas
-
-    // Convertir los valores a números para las gráficas
-    const duraciones = data.duraciones.map(Number);
-    const aceleraciones = data.aceleraciones.map(Number);
-    const velocidades = data.velocidades.map(Number);
-    const giros = data.giros.map(Number);
-
-    // Destruir las gráficas previas si existen
-    if (graficaDuracion) {
-      graficaDuracion.destroy();
-    }
-    if (graficaAceleracion) {
-      graficaAceleracion.destroy();
-    }
-    if (graficaVelocidad) {
-      graficaVelocidad.destroy();
-    }
-    if (graficaGiros) {
-      graficaGiros.destroy();
-    }
-
-    // Renderizar las nuevas gráficas
-    graficaDuracion = renderGrafica('graficaDuracion', data.sesiones, duraciones, '#FF6384');
-    graficaAceleracion = renderGrafica('graficaAceleracion', data.sesiones, aceleraciones, '#36A2EB');
-    graficaVelocidad = renderGrafica('graficaVelocidad', data.sesiones, velocidades, '#FFCE56');
-    graficaGiros = renderGrafica('graficaGiros', data.sesiones, giros, '#4BC0C0');
+  // Si los datos no están vacíos, actualizamos las gráficas
+  if (data && sesiones.length > 0) {
+    renderGrafica('graficaDuracion', sesiones, duraciones, '#FF6384');
+    renderGrafica('graficaAceleracion', sesiones, aceleraciones, '#36A2EB');
+    renderGrafica('graficaVelocidad', sesiones, velocidades, '#FFCE56');
+    renderGrafica('graficaGiros', sesiones, giros, '#4BC0C0');
   } else {
-    console.error('No se encontraron datos para este instrumento.');
-    alert('No se encontraron datos para este instrumento.');
+    alert('No se encontraron datos para este instrumento e infante.');
   }
 });
 
 function renderGrafica(canvasId, labels, data, color) {
   const ctx = document.getElementById(canvasId).getContext('2d');
-  
+
+  // Si ya existe una gráfica, la destruimos para crear una nueva
+  if (window[canvasId]) {
+    window[canvasId].destroy();
+  }
+
   // Creamos la nueva gráfica
-  return new Chart(ctx, {
+  window[canvasId] = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
@@ -132,19 +122,20 @@ function renderGrafica(canvasId, labels, data, color) {
         label: canvasId.replace('grafica',''),
         data: data,
         borderColor: color,
-        backgroundColor: color + '33',
-        tension: 0.3,
-        fill: true
+        backgroundColor: color + '33',  // Color de fondo más transparente
+        tension: 0.3,  // Aumentamos la curva para el polígono
+        fill: true  // Rellenamos el área bajo la curva
       }]
     },
     options: {
       responsive: true,
       plugins: { legend: { position: 'bottom' } },
-      scales: { y: { beginAtZero: true } }
+      scales: { 
+        y: { beginAtZero: true }  // Aseguramos que el eje Y empiece en 0
+      }
     }
   });
 }
-
 </script>
 
 {% endblock %}

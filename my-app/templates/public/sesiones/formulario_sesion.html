@@ -18,17 +18,6 @@
       </select>
     </div>
 
-    <!-- Terapia -->
-    <div class="mb-3">
-      <label for="id_terapia">Terapia</label>
-      <select name="id_terapia" class="form-select" required>
-        <option value="" disabled selected>Seleccione una terapia</option>
-        {% for terapia in terapias %}
-        <option value="{{ terapia.id_terapia }}">{{ terapia.nombre }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
     <!-- Terapeuta -->
     <div class="mb-3">
       <label for="id_terapeuta">Terapeuta</label>

@@ -39,12 +39,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Declaramos los colores solo una vez como variable global
-const coloresGlobales = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+// Colores reducidos a 3 (puedes agregar más si deseas)
+const coloresGlobales = ['#FF6384', '#36A2EB', '#FFCE56'];
 
 document.addEventListener('DOMContentLoaded', function () {
-  renderGraficaRoles();
-  renderGraficaKPIs();
+  const graficaRolesCanvas = document.getElementById('graficaRoles');
+  const graficaKPIsCanvas = document.getElementById('graficaKPIs');
+
+  if (graficaRolesCanvas && graficaKPIsCanvas) {
+    renderGraficaRoles();
+    renderGraficaKPIs();
+  } else {
+    console.error('No se encontraron los elementos canvas para las gráficas');
+  }
 });
 
 function renderGraficaRoles() {
@@ -52,7 +59,11 @@ function renderGraficaRoles() {
   const nombres = {{ nombres_roles | tojson | safe }};
   const cantidades = {{ cantidad_por_rol | tojson | safe }};
 
-  new Chart(ctx, {
+  if (window.graficaRoles instanceof Chart) {
+    window.graficaRoles.destroy();
+  }
+
+  window.graficaRoles = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: nombres,
@@ -72,15 +83,18 @@ function renderGraficaRoles() {
 
 function renderGraficaKPIs() {
   const ctx = document.getElementById('graficaKPIs').getContext('2d');
-  const etiquetas = ['Infantes', 'Terapias', 'Sesiones', 'Instrumentos'];
+  const etiquetas = ['Infantes', 'Sesiones', 'Instrumentos'];
   const valores = [
     {{ total_infantes }},
-    {{ total_terapias }},
     {{ total_sesiones }},
     {{ total_instrumentos }}
   ];
 
-  new Chart(ctx, {
+  if (window.graficaKPIs instanceof Chart) {
+    window.graficaKPIs.destroy();
+  }
+
+  window.graficaKPIs = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: etiquetas,
@@ -88,13 +102,22 @@ function renderGraficaKPIs() {
         label: 'Totales',
         data: valores,
         backgroundColor: coloresGlobales,
-        borderColor: coloresGlobales.map(color => color.replace('0.5', '1')),
+        borderColor: coloresGlobales.map(color => color),
         borderWidth: 1
       }]
     },
     options: {
       responsive: true,
-      scales: { y: { beginAtZero: true } }
+      scales: { y: { beginAtZero: true } },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Totales por Categoría'
+        },
+        legend: {
+          display: false
+        }
+      }
     }
   });
 }

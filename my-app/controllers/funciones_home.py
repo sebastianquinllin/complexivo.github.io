@@ -11,14 +11,13 @@ def obtener_kpis_dashboard():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    total_infantes = total_terapias = total_sesiones = total_instrumentos = 0
+    total_infantes = 0
+    total_sesiones = 0
+    total_instrumentos = 0
 
     try:
         cursor.execute("SELECT COUNT(*) FROM infantes")
         total_infantes = cursor.fetchone()[0]
-
-        cursor.execute("SELECT COUNT(*) FROM terapias")
-        total_terapias = cursor.fetchone()[0]
 
         cursor.execute("SELECT COUNT(*) FROM sesiones_terapia")
         total_sesiones = cursor.fetchone()[0]
@@ -29,7 +28,7 @@ def obtener_kpis_dashboard():
     finally:
         conexion.close()
 
-    return total_infantes, total_terapias, total_sesiones, total_instrumentos
+    return total_infantes, total_sesiones, total_instrumentos  # Ahora devolvemos 3 valores
 
 # ================== USUARIOS =======================
 
@@ -240,6 +239,7 @@ def listar_sesiones():
     finally:
         conexion.close()
 
+
 def crear_sesion(id_infante, id_terapia, id_terapeuta):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
@@ -356,7 +356,24 @@ def obtener_instrumentos():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id_instrumento, nombre FROM instrumentos")
-        return cursor.fetchall()
+        query = "SELECT id_instrumento, nombre FROM instrumentos"
+        cursor.execute(query)
+        instrumentos = cursor.fetchall()
     finally:
         conexion.close()
+    return instrumentos
+
+
+# Obtener infantes para el select
+def obtener_infantes():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    try:
+        query = "SELECT id_infante, nombre FROM infantes"
+        cursor.execute(query)
+        infantes = cursor.fetchall()
+        return infantes
+    finally:
+        conexion.close()
+
+
