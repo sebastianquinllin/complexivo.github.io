@@ -14,6 +14,18 @@
       <input type="text" class="form-control" name="nombre" id="nombre" required value="{{ infante.nombre if infante else '' }}">
     </div>
 
+    <!-- Apellido -->
+    <div class="mb-3">
+      <label for="apellido" class="form-label">Apellido del Infante:</label>
+      <input type="text" class="form-control" name="apellido" id="apellido" required value="{{ infante.apellido if infante else '' }}">
+    </div>
+
+    <!-- Cédula -->
+    <div class="mb-3">
+      <label for="cedula" class="form-label">Cédula:</label>
+      <input type="text" class="form-control" name="cedula" id="cedula" required pattern="\d{10}" maxlength="10" title="Ingrese una cédula de 10 dígitos" value="{{ infante.cedula if infante else '' }}">
+    </div>
+
     <!-- Género -->
     <div class="mb-3">
       <label for="id_genero" class="form-label">Género:</label>
@@ -28,10 +40,11 @@
       </select>
     </div>
 
-    <!-- Fecha de nacimiento -->
+    <!-- Fecha de nacimiento (sin validación en el input) -->
     <div class="mb-3">
       <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento:</label>
-      <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required value="{{ infante.fecha_nacimiento if infante else '' }}">
+      <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required 
+             value="{{ infante.fecha_nacimiento if infante else '' }}">
     </div>
 
     <!-- Padre -->

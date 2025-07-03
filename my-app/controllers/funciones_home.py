@@ -122,29 +122,55 @@ def obtener_padres():
         conexion.close()
     return padres
 
-def crear_infante(nombre, id_genero, fecha_nacimiento, id_padre):
+def crear_infante(nombre, apellido, cedula, id_genero, fecha_nacimiento, id_padre):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     try:
         query = """
-            INSERT INTO infantes (nombre, id_genero, fecha_nacimiento, id_padre)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO infantes (nombre, apellido, cedula, id_genero, fecha_nacimiento, id_padre)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (nombre, id_genero, fecha_nacimiento, id_padre))
+        cursor.execute(query, (nombre, apellido, cedula, id_genero, fecha_nacimiento, id_padre))
         conexion.commit()
     finally:
         conexion.close()
 
-def obtener_infante_por_id(id_infante):
+
+def listar_infantes(id_rol, id_usuario):
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     try:
-        query = "SELECT id_infante, nombre, id_genero, fecha_nacimiento, id_padre FROM infantes WHERE id_infante = %s"
-        cursor.execute(query, (id_infante,))
-        infante = cursor.fetchone()
+        if id_rol == 1:
+            # Administrador: ver todos los infantes
+            query = """
+                SELECT i.id_infante, i.nombre, i.apellido, i.cedula,
+                       g.nombre AS genero, i.fecha_nacimiento,
+                       u.nombre_usuario AS padre
+                FROM infantes i
+                LEFT JOIN generos g ON i.id_genero = g.id_genero
+                LEFT JOIN usuarios u ON i.id_padre = u.id_usuario
+                ORDER BY i.nombre ASC
+            """
+            cursor.execute(query)
+        else:
+            # Padre/madre: solo sus hijos
+            query = """
+                SELECT i.id_infante, i.nombre, i.apellido, i.cedula,
+                       g.nombre AS genero, i.fecha_nacimiento,
+                       u.nombre_usuario AS padre
+                FROM infantes i
+                LEFT JOIN generos g ON i.id_genero = g.id_genero
+                LEFT JOIN usuarios u ON i.id_padre = u.id_usuario
+                WHERE i.id_padre = %s
+                ORDER BY i.nombre ASC
+            """
+            cursor.execute(query, (id_usuario,))
+
+        infantes = cursor.fetchall()
     finally:
         conexion.close()
-    return infante
+    return infantes
+
 
 def eliminar_infante(id_infante):
     conexion = obtener_conexion()
@@ -222,37 +248,32 @@ def contar_usuarios_por_rol(id_rol):
         conexion.close()
 
 # ================= SESIONES CRUD =====================
-
 def listar_sesiones():
-    conexion = obtener_conexion()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        query = """
-            SELECT s.id_sesion, s.fecha_inicio, s.fecha_fin, s.cerrada, i.nombre AS infante
-            FROM sesiones_terapia s
-            JOIN infantes i ON s.id_infante = i.id_infante
-            ORDER BY s.id_sesion DESC
-        """
-        cursor.execute(query)
-        sesiones = cursor.fetchall()
-        return sesiones
-    finally:
-        conexion.close()
-
-
-def crear_sesion(id_infante, id_terapia, id_terapeuta):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     try:
-        query = """
-            INSERT INTO sesiones_terapia (id_infante, id_terapia, id_terapeuta, fecha_inicio)
-            VALUES (%s, %s, %s, NOW())
-        """
-        cursor.execute(query, (id_infante, id_terapia, id_terapeuta))
-        conexion.commit()
+        cursor.execute("""
+            SELECT id_sesion, fecha_inicio 
+            FROM sesiones_terapia
+            ORDER BY fecha_inicio DESC
+        """)
+        sesiones = cursor.fetchall()
+
+        sesiones_lista = []
+        for sesion in sesiones:
+            sesiones_lista.append({
+                'id_sesion': sesion[0],
+                'nombre_sesion': f"Sesión {sesion[0]}",
+                'fecha_sesion': sesion[1].strftime('%Y-%m-%d %H:%M') if sesion[1] else ''
+            })
+
+        return sesiones_lista
+
+    except Exception as e:
+        print(f"Error al listar sesiones: {str(e)}")
+        return []
     finally:
         conexion.close()
-
 
 def finalizar_sesion(id_sesion):
     conexion = obtener_conexion()
@@ -367,13 +388,10 @@ def obtener_instrumentos():
 # Obtener infantes para el select
 def obtener_infantes():
     conexion = obtener_conexion()
-    cursor = conexion.cursor(dictionary=True)
-    try:
-        query = "SELECT id_infante, nombre FROM infantes"
-        cursor.execute(query)
-        infantes = cursor.fetchall()
-        return infantes
-    finally:
-        conexion.close()
-
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id_infante, nombre FROM infantes ORDER BY nombre")
+    infantes = [{"id_infante": row[0], "nombre": row[1]} for row in cursor.fetchall()]
+    cursor.close()
+    conexion.close()
+    return infantes
 

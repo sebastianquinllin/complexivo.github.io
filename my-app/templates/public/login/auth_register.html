@@ -1,5 +1,4 @@
 {% extends 'public/base_cpanel.html' %}
-
 {% block title %}Registrar Usuario{% endblock %}
 
 {% block body %}
@@ -15,30 +14,30 @@
             </div>
           </div>
 
-          <form class="mb-3" action="{{ url_for('saved_register') }}" method="POST">
-
+          <form class="mb-3" action="{{ url_for('saved_register') }}" method="POST" id="registroForm">
             <!-- Cédula -->
             <div class="mb-3">
               <label for="cedula" class="form-label">Cédula</label>
-              <input type="text" class="form-control" name="cedula" required autofocus />
+              <input type="text" class="form-control" name="cedula" id="cedula" required autofocus 
+                     pattern="^\d{10}$" title="La cédula debe tener 10 dígitos" />
             </div>
 
             <!-- Nombre y Apellido -->
             <div class="row">
               <div class="mb-3 col-md-6">
                 <label for="name" class="form-label">Nombre</label>
-                <input type="text" class="form-control" name="name" required autofocus />
+                <input type="text" class="form-control" name="name" id="name" required autofocus />
               </div>
               <div class="mb-3 col-md-6">
                 <label for="surname" class="form-label">Apellido</label>
-                <input type="text" class="form-control" name="surname" required autofocus />
+                <input type="text" class="form-control" name="surname" id="surname" required autofocus />
               </div>
             </div>
 
             <!-- Correo -->
             <div class="mb-3">
               <label for="correo" class="form-label">Correo Electrónico</label>
-              <input type="email" class="form-control" name="correo" required autofocus />
+              <input type="email" class="form-control" name="correo" id="correo" required autofocus />
             </div>
 
             <!-- Rol -->
@@ -56,14 +55,16 @@
             <div class="mb-3 form-password-toggle">
               <label class="form-label" for="pass_user">Clave</label>
               <div class="input-group input-group-merge">
-                <input type="password" class="form-control" name="pass_user" id="pass_user" placeholder="********" required />
+                <input type="password" class="form-control" name="pass_user" id="pass_user" placeholder="********" required 
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).{8,}$" 
+                       title="La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas y números." />
                 <span class="input-group-text cursor-pointer">
                   <i class="bx bx-hide"></i>
                 </span>
               </div>
             </div>
 
-            <button class="btn btn-primary w-100">
+            <button class="btn btn-primary w-100" type="submit">
               Crear cuenta <i class="bi bi-arrow-right-circle"></i>
             </button>
           </form>
@@ -79,4 +80,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

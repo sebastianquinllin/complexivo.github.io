@@ -7,36 +7,44 @@
   <section id="respuestaFiltroMes">
     <h2 class="text-center mt-5 mb-5">Lista de Infantes <hr /></h2>
 
+    {% if dataLogin.rol == 1 %}
     <p class="btn btn-success" style="margin-left: 10px;">
       <a href="{{ url_for('nuevo_infante_route') }}">
         <span style="color: white;">Nuevo Infante</span>
       </a>
     </p>
+    {% endif %}
 
     {% if infantes %}
     <div class="table-responsive text-nowrap">
       <table class="table table-hover">
         <thead>
           <tr style="background-color: #ddd">
-            <th>Nombre</th>
+            <th>Cédula</th>
+            <th>Nombre Completo</th>
             <th>Género</th>
             <th>Fecha de Nacimiento</th>
             <th>Padre</th>
+            {% if dataLogin.rol == 1 %}
             <th>Acciones</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for infante in infantes %}
           <tr>
-            <td>{{ infante.nombre }}</td>
+            <td>{{ infante.cedula }}</td>
+            <td>{{ infante.nombre }} {{ infante.apellido }}</td>
             <td>{{ infante.genero }}</td>
             <td>{{ infante.fecha_nacimiento }}</td>
             <td>{{ infante.padre }}</td>
+            {% if dataLogin.rol == 1 %}
             <td>
               <a href="/infantes/eliminar/{{ infante.id_infante }}" class="btn btn-danger btn-sm">
                 <i class="bi bi-trash3"></i> Eliminar
               </a>
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>

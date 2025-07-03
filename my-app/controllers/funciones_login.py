@@ -1,5 +1,6 @@
 # Importando paquetes desde flask
 from flask import session, flash
+import re
 from conexion.conexionBD import obtener_conexion
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -67,6 +68,27 @@ def info_perfil_session(id):
         conexion.close()
 
 # Procesar actualización de perfil (para el propio usuario logueado)
+
+def obtener_info_perfil(id_usuario):
+    conexion = obtener_conexion()  # Conexión a la base de datos
+    cursor = conexion.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("SELECT  cedula, id_usuario, nombre_usuario, apellido_usuario, correo, id_rol FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+        perfil = cursor.fetchone()  # Obtenemos la información de un solo usuario
+        
+        if perfil:
+            return perfil  # Retornamos la información del usuario
+        else:
+            return None  # Si no existe, retornamos None
+            
+    except Exception as e:
+        print(f"Error al obtener la información del perfil: {e}")
+        return None  # En caso de error, retornamos None
+    finally:
+        conexion.close()  # Cerramos la conexión
+
+
 def procesar_update_perfil(data_form, id_usuario):
     cedula = data_form['cedula']
     nombre_usuario = data_form['name']
@@ -78,6 +100,11 @@ def procesar_update_perfil(data_form, id_usuario):
     new_pass_user = data_form.get('new_pass_user')
     repetir_pass_user = data_form.get('repetir_pass_user')
     pass_actual = data_form.get('pass_actual')
+
+    # Verificación de la seguridad de la contraseña nueva
+    def es_contrasena_segura(contrasena):
+        regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).{8,}$'
+        return re.match(regex, contrasena)
 
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
@@ -103,6 +130,9 @@ def procesar_update_perfil(data_form, id_usuario):
         if new_pass_user != repetir_pass_user:
             return 2
 
+        if not es_contrasena_segura(new_pass_user):
+            return 3
+
         nueva_password = generate_password_hash(new_pass_user, method='scrypt')
         update_query = """
             UPDATE usuarios SET nombre_usuario = %s, apellido_usuario = %s, correo = %s, password = %s, id_rol = %s
@@ -118,6 +148,7 @@ def procesar_update_perfil(data_form, id_usuario):
     finally:
         conexion.close()
 
+
 # Guardar la data de la sesión (opcional para tu uso en plantillas)
 def dataLoginSesion():
     inforLogin = {
@@ -127,3 +158,28 @@ def dataLoginSesion():
         "rol": session['rol']
     }
     return inforLogin
+
+#validacion cedula correo y contraseña 
+
+def validar_telefono(cedula):
+    # Validación de la cédula ecuatoriana: debe tener exactamente 10 dígitos
+    if len(cedula) != 10 or not cedula.isdigit():
+        return False
+    return True
+
+def validar_email(correo):
+    # Validación básica de correo electrónico
+    correo_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(correo_regex, correo) is not None
+
+def validar_clave(clave):
+    # Validación de la contraseña (mínimo 8 caracteres, al menos 1 letra mayúscula, 1 minúscula y 1 número)
+    clave_regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).{8,}$'
+    return re.match(clave_regex, clave) is not None
+
+#validacion contraseña perfil 
+
+def validar_password(nueva_clave):
+    # Validar que la contraseña tenga al menos 8 caracteres, incluya mayúsculas, minúsculas, números y caracteres especiales
+    password_regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[a-z]).{8,}$'
+    return re.match(password_regex, nueva_clave) is not None

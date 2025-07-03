@@ -7,44 +7,48 @@
 
   <a href="{{ url_for('nueva_sesion_route') }}" class="btn btn-primary mb-3">Nueva Sesión</a>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>ID Sesión</th>
-        <th>Infante</th>
-        <th>Fecha Inicio</th>
-        <th>Fecha Fin</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for sesion in sesiones %}
-      <tr>
-        <td>{{ sesion.id_sesion }}</td>
-        <td>{{ sesion.infante }}</td>
-        <td>{{ sesion.fecha_inicio }}</td>
-        <td>{{ sesion.fecha_fin or 'En progreso' }}</td>
-        <td>
-          {% if sesion.cerrada %}
-            <span class="badge bg-success">Finalizada</span>
-          {% else %}
-            <span class="badge bg-warning text-dark">En Progreso</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if not sesion.cerrada %}
-            <a href="{{ url_for('finalizar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-success btn-sm">Finalizar</a>
-            <a href="{{ url_for('control_sesion', id_sesion=sesion.id_sesion) }}" class="btn btn-secondary btn-sm">Control</a>
-          {% else %}
-            <span class="text-muted">--</span>
-          {% endif %}
-          <a href="{{ url_for('eliminar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-danger btn-sm">Eliminar</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% if sesiones and sesiones|length > 0 %}
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID Sesión</th>
+          <th>Infante</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sesion in sesiones %}
+        <tr>
+          <td>{{ sesion.id_sesion }}</td>
+          <td>{{ sesion.infante }}</td>
+          <td>{{ sesion.fecha_inicio }}</td>
+          <td>{{ sesion.fecha_fin or 'En progreso' }}</td>
+          <td>
+            {% if sesion.cerrada %}
+              <span class="badge bg-success">Finalizada</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">En Progreso</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not sesion.cerrada %}
+              <a href="{{ url_for('finalizar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-success btn-sm">Finalizar</a>
+              <a href="{{ url_for('control_sesion', id_sesion=sesion.id_sesion) }}" class="btn btn-secondary btn-sm">Control</a>
+            {% else %}
+              <span class="text-muted">--</span>
+            {% endif %}
+            <a href="{{ url_for('eliminar_sesion_route', id_sesion=sesion.id_sesion) }}" class="btn btn-danger btn-sm">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">No hay sesiones registradas aún.</div>
+  {% endif %}
 </div>
 
 {% endblock %}

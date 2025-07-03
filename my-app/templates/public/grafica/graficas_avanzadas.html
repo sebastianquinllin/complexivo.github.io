@@ -3,16 +3,16 @@
 {% block body %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Análisis Avanzado de Instrumentos</h2>
+  <h2 class="text-center mb-4">Análisis Avanzado por Sesión e Instrumento</h2>
 
-  <!-- Formulario de filtro -->
+  <!-- Filtro -->
   <form id="filtro-form" class="row g-3 mb-5">
     <div class="col-md-4">
-      <label for="instrumento" class="form-label">Instrumento:</label>
-      <select id="instrumento" name="instrumento" class="form-select" required>
-        <option value="" disabled selected>Seleccione Instrumento</option>
-        {% for instrumento in instrumentos %}
-        <option value="{{ instrumento.id_instrumento }}">{{ instrumento.nombre }}</option>
+      <label for="infante" class="form-label">Infante:</label>
+      <select id="infante" name="infante" class="form-select" required>
+        <option value="" disabled selected>Seleccione Infante</option>
+        {% for infante in infantes %}
+          <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
         {% endfor %}
       </select>
     </div>
@@ -32,122 +32,113 @@
     </div>
   </form>
 
-  <!-- Gráficas separadas -->
-  <div class="row g-5">
-
-    <!-- Duración Gráfica -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Duración (s)</b></div>
-        <div class="card-body">
-          <canvas id="graficaDuracion"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Aceleración Gráfica -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Aceleración</b></div>
-        <div class="card-body">
-          <canvas id="graficaAceleracion"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Velocidad Gráfica -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Velocidad</b></div>
-        <div class="card-body">
-          <canvas id="graficaVelocidad"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Giros Gráfica -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Giros</b></div>
-        <div class="card-body">
-          <canvas id="graficaGiros"></canvas>
-        </div>
-      </div>
-    </div>
-
+  <!-- Sin datos -->
+  <div id="mensaje-sin-datos" class="alert alert-warning d-none text-center" role="alert">
+    No se encontraron datos para el infante y rango de fechas seleccionado.
   </div>
+
+  <!-- Contenedor dinámico de gráficas -->
+  <div id="graficas-dinamicas" class="row g-4"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-// Variables globales para almacenar las gráficas
-let graficaDuracion = null;
-let graficaAceleracion = null;
-let graficaVelocidad = null;
-let graficaGiros = null;
+function renderGraficasPorSesion(sesiones) {
+  const contenedor = document.getElementById("graficas-dinamicas");
+  contenedor.innerHTML = ""; // limpiar previos
 
-document.getElementById('filtro-form').addEventListener('submit', async function(e) {
+  sesiones.forEach((sesion, index) => {
+    const canvasId = `grafica-${index}`;
+
+    const card = document.createElement("div");
+    card.className = "col-md-6";
+    card.innerHTML = `
+      <div class="card">
+        <div class="card-header text-center"><b>${sesion.titulo}</b></div>
+        <div class="card-body">
+          <canvas id="${canvasId}"></canvas>
+        </div>
+      </div>
+    `;
+    contenedor.appendChild(card);
+
+    const ctx = document.getElementById(canvasId).getContext("2d");
+
+    const instrumentos = sesion.instrumentos;
+
+    const datasets = [
+      {
+        label: "Suma Ángulos",
+        data: instrumentos.map(i => i.suma_angulos),
+        backgroundColor: "#FF6384"
+      },
+      {
+        label: "Aceleración",
+        data: instrumentos.map(i => i.aceleracion),
+        backgroundColor: "#36A2EB"
+      },
+      {
+        label: "Velocidad",
+        data: instrumentos.map(i => i.velocidad),
+        backgroundColor: "#FFCE56"
+      },
+      {
+        label: "Giros",
+        data: instrumentos.map(i => i.giros),
+        backgroundColor: "#4BC0C0"
+      }
+    ];
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: instrumentos.map(i => i.nombre),
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Total" }
+          }
+        }
+      }
+    });
+  });
+
+  document.getElementById("mensaje-sin-datos").classList.add("d-none");
+}
+
+document.getElementById("filtro-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const id_instrumento = document.getElementById('instrumento').value;
-  const fecha_inicio = document.getElementById('fecha_inicio').value;
-  const fecha_fin = document.getElementById('fecha_fin').value;
+  const id_infante = document.getElementById("infante").value;
+  const fecha_inicio = document.getElementById("fecha_inicio").value;
+  const fecha_fin = document.getElementById("fecha_fin").value;
 
-  const response = await fetch(`/api/graficas-avanzadas/${id_instrumento}?inicio=${fecha_inicio}&fin=${fecha_fin}`);
-  const data = await response.json();
+  try {
+    const response = await fetch(`/api/graficas-avanzadas?id_infante=${id_infante}&inicio=${fecha_inicio}&fin=${fecha_fin}`);
+    const data = await response.json();
 
-  const sesiones = data.sesiones;
-  const duraciones = data.duraciones;
-  const aceleraciones = data.aceleraciones;
-  const velocidades = data.velocidades;
-  const giros = data.giros;
-
-  // Destruir las gráficas anteriores si existen
-  if (graficaDuracion) {
-    graficaDuracion.destroy();
-  }
-  if (graficaAceleracion) {
-    graficaAceleracion.destroy();
-  }
-  if (graficaVelocidad) {
-    graficaVelocidad.destroy();
-  }
-  if (graficaGiros) {
-    graficaGiros.destroy();
-  }
-
-  // Renderizar las nuevas gráficas
-  graficaDuracion = renderGrafica('graficaDuracion', sesiones, duraciones, '#FF6384');
-  graficaAceleracion = renderGrafica('graficaAceleracion', sesiones, aceleraciones, '#36A2EB');
-  graficaVelocidad = renderGrafica('graficaVelocidad', sesiones, velocidades, '#FFCE56');
-  graficaGiros = renderGrafica('graficaGiros', sesiones, giros, '#4BC0C0');
-});
-
-function renderGrafica(canvasId, labels, data, color) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
-  
-  // Creamos la nueva gráfica
-  return new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: canvasId.replace('grafica',''),
-        data: data,
-        borderColor: color,
-        backgroundColor: color + '33',
-        tension: 0.3,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'bottom' } },
-      scales: { y: { beginAtZero: true } }
+    if (data.error || !data.sesiones || data.sesiones.length === 0) {
+      document.getElementById("mensaje-sin-datos").classList.remove("d-none");
+      document.getElementById("graficas-dinamicas").innerHTML = "";
+      return;
     }
-  });
-}
+
+    renderGraficasPorSesion(data.sesiones);
+  } catch (error) {
+    console.error("Error al cargar datos:", error);
+    alert("Ocurrió un error al cargar las gráficas.");
+  }
+});
 </script>
 
 {% endblock %}

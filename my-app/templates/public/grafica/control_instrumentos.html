@@ -3,139 +3,166 @@
 {% block body %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Análisis por Instrumento y Infante</h2>
+  <h2 class="text-center mb-4">Análisis por Sesión</h2>
 
-  <!-- Formulario de filtro -->
+  <!-- Selector de sesión -->
   <form id="filtro-form" class="mb-4">
     <div class="row">
       <div class="col-md-4">
-        <label for="instrumentoSelect" class="form-label">Seleccione el Instrumento:</label>
-        <select id="instrumentoSelect" class="form-select">
-          <option value="" disabled selected>Seleccione un instrumento</option>
-          {% for instrumento in instrumentos %}
-          <option value="{{ instrumento.id_instrumento }}">{{ instrumento.nombre }}</option>
-          {% endfor %}
+        <label for="sesionSelect" class="form-label">Seleccione la Sesión:</label>
+        <select id="sesionSelect" class="form-select">
+          <option value="" disabled selected>Seleccione una sesión</option>
+          {% if sesiones %}
+            {% for sesion in sesiones %}
+              <option value="{{ sesion.id_sesion }}">
+                {{ sesion.nombre_sesion }} - {{ sesion.fecha_sesion }}
+              </option>
+            {% endfor %}
+          {% else %}
+            <option disabled>No hay sesiones disponibles</option>
+          {% endif %}
         </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="infanteSelect" class="form-label">Seleccione el Infante:</label>
-        <select id="infanteSelect" class="form-select">
-          <option value="" disabled selected>Seleccione un infante</option>
-          {% for infante in infantes %}
-          <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
-          {% endfor %}
-        </select>
+        <div class="mt-2">
+          <small class="text-muted">Debug: {{ sesiones|length }} sesiones cargadas</small>
+        </div>
       </div>
 
       <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        <button type="button" id="buscarButton" class="btn btn-success w-100">Buscar</button>
       </div>
     </div>
   </form>
 
-  <!-- Gráficas separadas -->
+  <!-- Sección de HAMACA -->
+  <h4 class="mt-5">Hamaca</h4>
   <div class="row g-5">
+    <div class="col-md-6"><canvas id="grafHamacaAngulo"></canvas></div>
+    <div class="col-md-6"><canvas id="grafHamacaAceleracion"></canvas></div>
+    <div class="col-md-6"><canvas id="grafHamacaVelocidad"></canvas></div>
+    <div class="col-md-6"><canvas id="grafHamacaGiros"></canvas></div>
+  </div>
 
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Duración (s)</b></div>
-        <div class="card-body"><canvas id="graficaDuracion"></canvas></div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Aceleración</b></div>
-        <div class="card-body"><canvas id="graficaAceleracion"></canvas></div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Velocidad</b></div>
-        <div class="card-body"><canvas id="graficaVelocidad"></canvas></div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center"><b>Giros</b></div>
-        <div class="card-body"><canvas id="graficaGiros"></canvas></div>
-      </div>
-    </div>
-
+  <!-- Sección de SILLA -->
+  <h4 class="mt-5">Silla</h4>
+  <div class="row g-5">
+    <div class="col-md-6"><canvas id="grafSillaAngulo"></canvas></div>
+    <div class="col-md-6"><canvas id="grafSillaAceleracion"></canvas></div>
+    <div class="col-md-6"><canvas id="grafSillaVelocidad"></canvas></div>
+    <div class="col-md-6"><canvas id="grafSillaGiros"></canvas></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Función principal para actualizar las gráficas cuando se cambia de instrumento y infante
-document.getElementById('filtro-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
+  const charts = {};
 
-  const id_instrumento = document.getElementById('instrumentoSelect').value;
-  const id_infante = document.getElementById('infanteSelect').value;
-
-  // Validación para asegurar que ambos filtros estén seleccionados
-  if (!id_instrumento || !id_infante) {
-    alert('Por favor, seleccione tanto el instrumento como el infante.');
-    return;
-  }
-
-  // Realizamos el fetch para obtener los datos de todas las sesiones del instrumento e infante seleccionado
-  const response = await fetch(`/api/datos-instrumento-infante/${id_instrumento}/${id_infante}`);
-  const data = await response.json();
-
-  const sesiones = data.sesiones;
-  const duraciones = data.duraciones;
-  const aceleraciones = data.aceleraciones;
-  const velocidades = data.velocidades;
-  const giros = data.giros;
-
-  // Si los datos no están vacíos, actualizamos las gráficas
-  if (data && sesiones.length > 0) {
-    renderGrafica('graficaDuracion', sesiones, duraciones, '#FF6384');
-    renderGrafica('graficaAceleracion', sesiones, aceleraciones, '#36A2EB');
-    renderGrafica('graficaVelocidad', sesiones, velocidades, '#FFCE56');
-    renderGrafica('graficaGiros', sesiones, giros, '#4BC0C0');
-  } else {
-    alert('No se encontraron datos para este instrumento e infante.');
-  }
-});
-
-function renderGrafica(canvasId, labels, data, color) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
-
-  // Si ya existe una gráfica, la destruimos para crear una nueva
-  if (window[canvasId]) {
-    window[canvasId].destroy();
-  }
-
-  // Creamos la nueva gráfica
-  window[canvasId] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: canvasId.replace('grafica',''),
-        data: data,
-        borderColor: color,
-        backgroundColor: color + '33',  // Color de fondo más transparente
-        tension: 0.3,  // Aumentamos la curva para el polígono
-        fill: true  // Rellenamos el área bajo la curva
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { position: 'bottom' } },
-      scales: { 
-        y: { beginAtZero: true }  // Aseguramos que el eje Y empiece en 0
-      }
+  async function cargarDatosSesion(id_sesion) {
+    if (!id_sesion || isNaN(id_sesion)) {
+      alert("Sesión no válida seleccionada.");
+      return;
     }
-  });
-}
-</script>
 
+    try {
+      const response = await fetch(`/api/datos-instrumentos-sesionV2/${id_sesion}`);
+      if (!response.ok) throw new Error("Error al obtener datos del servidor");
+
+      const data = await response.json();
+
+      if (!data.instrumentos || data.instrumentos.length === 0) {
+        alert('No se encontraron datos para esta sesión.');
+        limpiarGraficas();
+        return;
+      }
+
+      const hamaca = data.instrumentos.filter(i => i.tipo === "Hamaca");
+      const silla = data.instrumentos.filter(i => i.tipo === "Silla");
+
+      // Graficar HAMACA
+      renderGrafica("grafHamacaAngulo", hamaca.map(i => i.timestamp), hamaca.map(i => i.suma_angulos), "#FF6384", "Angulo Hamaca");
+      renderGrafica("grafHamacaAceleracion", hamaca.map(i => i.timestamp), hamaca.map(i => i.aceleracion), "#36A2EB", "Aceleración Hamaca");
+      renderGrafica("grafHamacaVelocidad", hamaca.map(i => i.timestamp), hamaca.map(i => i.velocidad), "#FFCE56", "Velocidad Hamaca");
+      renderGrafica("grafHamacaGiros", hamaca.map(i => i.timestamp), hamaca.map(i => i.giros), "#4BC0C0", "Giros Hamaca");
+
+      // Graficar SILLA
+      renderGrafica("grafSillaAngulo", silla.map(i => i.timestamp), silla.map(i => i.suma_angulos), "#A0522D", "Angulo Silla");
+      renderGrafica("grafSillaAceleracion", silla.map(i => i.timestamp), silla.map(i => i.aceleracion), "#9370DB", "Aceleración Silla");
+      renderGrafica("grafSillaVelocidad", silla.map(i => i.timestamp), silla.map(i => i.velocidad), "#20B2AA", "Velocidad Silla");
+      renderGrafica("grafSillaGiros", silla.map(i => i.timestamp), silla.map(i => i.giros), "#F08080", "Giros Silla");
+
+    } catch (error) {
+      console.error("Error al cargar los datos:", error);
+      alert("Ocurrió un error al cargar los datos.");
+    }
+  }
+
+  function renderGrafica(canvasId, labels, data, color, titulo) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (charts[canvasId] instanceof Chart) {
+      charts[canvasId].destroy();
+    }
+
+    charts[canvasId] = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: titulo,
+          data: data,
+          borderColor: color,
+          backgroundColor: color + "33",
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" },
+          title: { display: true, text: titulo }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Fecha y hora" },
+            ticks: {
+              autoSkip: true,
+              maxRotation: 45,
+              minRotation: 30
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Valor" }
+          }
+        }
+      }
+    });
+  }
+
+  function limpiarGraficas() {
+    Object.keys(charts).forEach(id => {
+      if (charts[id] instanceof Chart) {
+        charts[id].destroy();
+        charts[id] = null;
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("buscarButton").addEventListener("click", () => {
+      const id_sesion = document.getElementById("sesionSelect").value;
+      if (id_sesion) cargarDatosSesion(id_sesion);
+      else alert("Seleccione una sesión válida.");
+    });
+
+    document.getElementById("sesionSelect").addEventListener("change", () => {
+      const id_sesion = document.getElementById("sesionSelect").value;
+      if (id_sesion) cargarDatosSesion(id_sesion);
+    });
+  });
+</script>
+  
 {% endblock %}

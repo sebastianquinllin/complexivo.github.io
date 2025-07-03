@@ -37,9 +37,6 @@
             <td>{{ usuario.correo }}</td>
             <td>{{ usuario.nombre_rol }}</td>
             <td>
-              <a href="/mi-perfil/{{ usuario.id_usuario }}" class="btn btn-success btn-sm" tooltip="Actualizar Registro">
-                <i class="bi bi-arrow-clockwise"></i> Actualizar
-              </a>
               <a href="javascript:void(0);" onclick="eliminarUsuario('{{ usuario.id_usuario }}');"
                  class="btn btn-danger btn-sm"
                  data-bs-toggle="tooltip"

@@ -16,17 +16,23 @@ def inicio():
 
 # --------------------------- Perfil usuario ---------------------------
 
-@app.route('/mi-perfil/<string:id>', methods=['GET'])
+@app.route('/mi-perfil/<int:id>', methods=['GET'])
 def perfil(id):
-    if 'id' in session:
-        info_perfil = info_perfil_session(id)
-        roles = obtener_roles()
-        return render_template('public/perfil/perfil.html',
-                                info_perfil_session=info_perfil,
-                                dataLogin=dataLoginSesion(),
-                                roles=roles)
-    else:
+    if 'id' not in session:
+        flash("Primero debes iniciar sesión.", "error")
         return redirect(url_for('inicio'))
+
+    if session['id'] != id:
+        flash("No tienes permiso para ver este perfil.", "error")
+        return redirect(url_for('inicio'))
+
+    info_perfil = obtener_info_perfil(id)
+    roles = obtener_roles()
+
+    return render_template('public/perfil/perfil.html',
+                           info_perfil_session=info_perfil,
+                           dataLogin=dataLoginSesion(),
+                           roles=roles)
 
 # --------------------------- Formulario de registro ---------------------------
 
@@ -39,46 +45,86 @@ def register_user_form():
 
 # --------------------------- Guardar usuario registrado ---------------------------
 
-@app.route('/saved-register', methods=['POST'])
-def saved_register():
-    if request.method == 'POST':
-        cedula = request.form['cedula']
-        name = request.form['name']
-        surname = request.form['surname']
-        correo = request.form['correo']
-        id_rol = request.form['selectRol']
-        pass_user = request.form['pass_user']
+from werkzeug.security import generate_password_hash
 
-        resultData = recibeInsertRegisterUser(cedula, name, surname, correo, id_rol, pass_user)
-        if resultData != 0:
-            registrar_log(session['id'], 'CREAR', 'usuarios')
-            flash('La cuenta fue creada correctamente.', 'success')
-            return redirect(url_for('inicio'))
-        else:
-            return redirect(url_for('inicio'))
-    else:
-        flash('Error en la solicitud.', 'error')
-        return redirect(url_for('inicio'))
+@app.route("/saved-register", methods=['POST'])
+def saved_register():
+    cedula = request.form['cedula']
+    nombre = request.form['name']
+    apellido = request.form['surname']
+    correo = request.form['correo']
+    pass_user = request.form['pass_user']
+    id_rol = request.form['selectRol']
+
+    if not validar_telefono(cedula):
+        flash('La cédula debe tener 10 dígitos válidos', 'error')
+        return redirect(url_for('register_user_form'))
+
+    if not validar_email(correo):
+        flash('El correo electrónico no es válido', 'error')
+        return redirect(url_for('register_user_form'))
+
+    if not validar_clave(pass_user):
+        flash('La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números', 'error')
+        return redirect(url_for('register_user_form'))
+
+    try:
+        hashed_password = generate_password_hash(pass_user, method='scrypt', salt_length=16)
+        crear_usuario(cedula, nombre, apellido, correo, hashed_password, id_rol)
+        flash('Usuario registrado exitosamente.', 'success')
+        return redirect(url_for('usuarios'))
+    except Exception as e:
+        flash(f'Ocurrió un error: {e}', 'error')
+        return redirect(url_for('register_user_form'))
 
 # --------------------------- Actualizar datos de perfil ---------------------------
-
-@app.route("/actualizar-datos-perfil/<int:id>", methods=['POST'])
+@app.route("/actualizarPerfil/<int:id>", methods=["POST"])
 def actualizarPerfil(id):
-    if 'id' in session:
-        respuesta = procesar_update_perfil(request.form, id)
-        if respuesta == 1:
-            flash('Los datos fueron actualizados correctamente.', 'success')
-            return redirect(url_for('inicio'))
-        elif respuesta == 0:
-            flash('La contraseña actual es incorrecta.', 'error')
-        elif respuesta == 2:
-            flash('Las nuevas contraseñas no coinciden.', 'error')
-        else:
-            flash('Error en la actualización.', 'error')
-        return redirect(url_for('perfil', id=id))
-    else:
-        flash('Debe iniciar sesión.', 'error')
-        return redirect(url_for('inicio'))
+    if 'id' not in session or session['id'] != id:
+        flash("No tienes permiso para actualizar este perfil.", "error")
+        return redirect(url_for("inicio"))
+
+    pass_actual = request.form.get("pass_actual")
+    new_pass = request.form.get("new_pass_user")
+    repetir_pass = request.form.get("repetir_pass_user")
+
+    # Validación: contraseñas coinciden
+    if new_pass != repetir_pass:
+        flash("Las nuevas contraseñas no coinciden.", "error")
+        return redirect(url_for("perfil", id=id))
+
+    # Validación: formato seguro de contraseña nueva
+    if not re.match(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$', new_pass):
+        flash("La nueva contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.", "error")
+        return redirect(url_for("perfil", id=id))
+
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT password FROM usuarios WHERE id_usuario = %s", (id,))
+            usuario = cursor.fetchone()
+
+            if not usuario:
+                flash("Usuario no encontrado.", "error")
+                return redirect(url_for("perfil", id=id))
+
+            if not check_password_hash(usuario["password"], pass_actual):
+                flash("La contraseña actual es incorrecta.", "error")
+                return redirect(url_for("perfil", id=id))
+
+            nueva_hash = generate_password_hash(new_pass, method="scrypt", salt_length=16)
+
+            cursor.execute("UPDATE usuarios SET password = %s WHERE id_usuario = %s", (nueva_hash, id))
+            conexion.commit()
+
+            flash("Contraseña actualizada correctamente.", "success")
+            return redirect(url_for("perfil", id=id))
+
+    except Exception as e:
+        flash(f"Error al actualizar: {e}", "error")
+        return redirect(url_for("inicio"))
+    finally:
+        conexion.close()
 
 # --------------------------- Login principal ---------------------------
 

@@ -24,34 +24,31 @@
           <!-- Nombre -->
           <div class="mb-3">
             <label for="name" class="form-label">Nombre</label>
-            <input type="text" name="name" value="{{ info_perfil_session['nombre_usuario'] }}" class="form-control" required />
+            <input type="text" name="name" value="{{ info_perfil_session['nombre_usuario'] }}" class="form-control" readonly />
           </div>
 
           <!-- Apellido -->
           <div class="mb-3">
             <label for="surname" class="form-label">Apellido</label>
-            <input class="form-control" type="text" name="surname" value="{{ info_perfil_session['apellido_usuario'] }}" required />
+            <input class="form-control" type="text" name="surname" value="{{ info_perfil_session['apellido_usuario'] }}" readonly />
           </div>
 
           <!-- Correo -->
           <div class="mb-3">
             <label for="correo" class="form-label">Correo Electrónico</label>
-            <input class="form-control" type="email" name="correo" value="{{ info_perfil_session['correo'] }}" required />
+            <input class="form-control" type="email" name="correo" value="{{ info_perfil_session['correo'] }}" readonly />
           </div>
 
           <!-- Rol -->
           <div class="mb-3">
             <label for="rol" class="form-label">Rol</label>
-            <select class="form-select" name="selectRol" {% if dataLogin.rol != 1 %} disabled {% endif %}>
+            <select class="form-select" name="selectRol" disabled>
               {% for rol in roles %}
               <option value="{{ rol.id_rol }}" {% if rol.id_rol == info_perfil_session['id_rol'] %} selected {% endif %}>
                 {{ rol.nombre_rol }}
               </option>
               {% endfor %}
             </select>
-            {% if dataLogin.rol != 1 %}
-            <input type="hidden" name="selectRol" value="{{ info_perfil_session['id_rol'] }}">
-            {% endif %}
           </div>
 
           <!-- Campos de cambio de contraseña (solo si es el mismo usuario) -->
@@ -59,7 +56,7 @@
           <div class="mb-3 form-password-toggle mt-3">
             <label class="form-label" for="pass_actual">Clave Actual</label>
             <div class="input-group input-group-merge">
-              <input type="password" class="form-control" name="pass_actual" id="pass_actual" placeholder="********" />
+              <input type="password" class="form-control" name="pass_actual" id="pass_actual" placeholder="********" required />
               <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
             </div>
           </div>
@@ -67,7 +64,7 @@
           <div class="mb-3 form-password-toggle">
             <label class="form-label" for="new_pass_user">Nueva Clave</label>
             <div class="input-group input-group-merge">
-              <input type="password" class="form-control" name="new_pass_user" id="new_pass_user" placeholder="********" />
+              <input type="password" class="form-control" name="new_pass_user" id="new_pass_user" placeholder="********" required />
               <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
             </div>
           </div>
@@ -75,7 +72,7 @@
           <div class="mb-3 form-password-toggle">
             <label class="form-label" for="repetir_pass_user">Repetir Nueva Clave</label>
             <div class="input-group input-group-merge">
-              <input type="password" class="form-control" name="repetir_pass_user" id="repetir_pass_user" placeholder="********" />
+              <input type="password" class="form-control" name="repetir_pass_user" id="repetir_pass_user" placeholder="********" required />
               <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
             </div>
           </div>
