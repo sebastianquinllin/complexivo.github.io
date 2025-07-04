@@ -2,13 +2,17 @@
 
 {% block title %}Lista de Infantes{% endblock %}
 
+{% block customCSS %}
+<!-- Si quieres probar rápido puedes pegar el CSS aquí, o mejor en tu my_style.css -->
+{% endblock %}
+
 {% block body %}
-<div class="card content_consignaciones" style="border-radius: 0px !important">
+<div class="card content_consignaciones card-neon">
   <section id="respuestaFiltroMes">
     <h2 class="text-center mt-5 mb-5">Lista de Infantes <hr /></h2>
 
     {% if dataLogin.rol == 1 %}
-    <p class="btn btn-success" style="margin-left: 10px;">
+    <p class="btn btn-neon" style="margin-left: 10px;">
       <a href="{{ url_for('nuevo_infante_route') }}">
         <span style="color: white;">Nuevo Infante</span>
       </a>
@@ -19,7 +23,7 @@
     <div class="table-responsive text-nowrap">
       <table class="table table-hover">
         <thead>
-          <tr style="background-color: #ddd">
+          <tr>
             <th>Cédula</th>
             <th>Nombre Completo</th>
             <th>Género</th>

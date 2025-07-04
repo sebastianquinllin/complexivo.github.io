@@ -1,4 +1,6 @@
 body {
+  background: radial-gradient(circle, #1a2980 0%, #0a1026 100%);
+  color: #fff;
   font-family: "Open Sans", sans-serif;
 }
 
@@ -237,4 +239,196 @@ tbody tr:hover {
 
 .acceso {
   line-height: 18px;
+}
+
+/*Cambios ventana cpanel inicio*/
+
+.card-imagen-personalizada {
+  background: rgba(15,18,37, 0.90);
+  border-radius: 2rem;
+  box-shadow: 0 4px 40px 0 rgba(0, 195, 255, 0.4), 0 0 18px 2px #39ff14 inset;
+  border: 3px solid #00c3ff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+.card-imagen-personalizada:hover {
+  box-shadow: 0 8px 80px 0 #ff3cac66, 0 0 22px 4px #39ff14cc inset;
+  border-color: #ff3cac;
+}
+.card-imagen-personalizada h3 {
+  color: #39ff14;
+  text-shadow: 0 0 10px #00c3ff, 0 0 12px #39ff14;
+  font-weight: bold;
+  margin-top: 1.5rem;
+}
+.card-imagen-personalizada img {
+  max-height: 250px;
+  border-radius: 1.5rem;
+  border: 2px solid #ff3cac;
+  box-shadow: 0 0 16px 4px #00c3ff88, 0 0 28px 0 #ff3cac55;
+}
+
+.card-neon {
+  background: rgba(15,18,37, 0.95) !important;
+  border-radius: 2rem !important;
+  border: 3px solid #00c3ff !important;
+  box-shadow: 0 4px 24px 0 #00c3ff55, 0 0 8px #ff3cac88;
+  color: #fff !important;
+  margin-bottom: 2rem;
+}
+
+.card-neon h2, .card-neon th, .card-neon td {
+  color: #39ff14 !important;
+  text-shadow: 0 0 4px #00c3ff, 0 0 6px #39ff14;
+}
+
+.card-neon table {
+  background: transparent !important;
+}
+
+.card-neon thead tr {
+  background: #1a2980 !important;
+  color: #39ff14 !important;
+}
+
+.card-neon tbody tr {
+  background: rgba(10,16,38,0.7) !important;
+  color: #fff !important;
+}
+
+.card-neon tbody tr:hover {
+  background: #ff3cac55 !important;
+}
+
+.card-neon a, .card-neon a:visited {
+  color: #fff338 !important;
+  text-shadow: 0 0 6px #ff3cac;
+}
+
+.btn-neon {
+  background: linear-gradient(90deg, #00c3ff, #ff3cac 70%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 0 10px #00c3ff, 0 0 20px #ff3cac77;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-neon:hover {
+  background: linear-gradient(90deg, #39ff14, #ff3cac) !important;
+  box-shadow: 0 0 16px #39ff14, 0 0 22px #ff3cacbb;
+  color: #222 !important;
+}
+
+
+.card-neon .form-select, 
+.card-neon .form-control {
+  background: #1a2980 !important;
+  color: #39ff14 !important;
+  border: 2px solid #00c3ff !important;
+  box-shadow: 0 0 8px #00c3ff88;
+  border-radius: 1rem;
+  transition: border-color 0.2s;
+}
+
+.card-neon .form-select:focus, 
+.card-neon .form-control:focus {
+  border-color: #ff3cac !important;
+  box-shadow: 0 0 12px #ff3cac88;
+  background: #0a1026 !important;
+  color: #fff338 !important;
+}
+
+.card-neon label {
+  color: #fff338 !important;
+  text-shadow: 0 0 6px #ff3cac;
+  font-weight: bold;
+}
+
+
+.card-neon .form-select, 
+.card-neon .form-control {
+  background: #1a2980 !important;
+  color: #39ff14 !important;
+  border: 2px solid #00c3ff !important;
+  box-shadow: 0 0 8px #00c3ff88;
+  border-radius: 1rem;
+  transition: border-color 0.2s;
+}
+
+.card-neon .form-select:focus, 
+.card-neon .form-control:focus {
+  border-color: #ff3cac !important;
+  box-shadow: 0 0 12px #ff3cac88;
+  background: #0a1026 !important;
+  color: #fff338 !important;
+}
+
+.card-neon label {
+  color: #fff338 !important;
+  text-shadow: 0 0 6px #ff3cac;
+  font-weight: bold;
+}
+
+
+/*Fin cambios ventana cpanel inicio*/
+
+/* FONDO SIDEBAR */
+.menu-vertical, .sidebar, aside {
+  background: linear-gradient(180deg, #0a1026 0%, #1a2980 100%) !important;
+  border-right: 3px solid #00c3ff;
+  box-shadow: 4px 0 24px 0 #00c3ff44;
+}
+
+/* ESTILO GENERAL DE LOS ITEMS */
+.menu-item {
+  border-radius: 1rem;
+  margin-bottom: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.menu-link {
+  color: #fff338 !important;
+  font-weight: 600;
+  text-shadow: 0 0 4px #00c3ff99;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 1rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu-icon {
+  color: #39ff14 !important;
+  font-size: 1.2rem;
+  text-shadow: 0 0 6px #39ff1488;
+  transition: color 0.2s;
+}
+
+.menu-link:hover, .menu-item.active .menu-link {
+  background: linear-gradient(90deg, #00c3ff 40%, #ff3cac 100%);
+  color: #0a1026 !important;
+  box-shadow: 0 0 12px #39ff1499;
+  text-shadow: none;
+}
+
+.menu-item.active .menu-icon,
+.menu-link:hover .menu-icon {
+  color: #fff338 !important;
+  text-shadow: 0 0 12px #fff338bb;
+}
+
+/* OPCIONAL: Para resaltar solo Reporte de Actividad */
+.menu-item-neon .menu-link {
+  border-left: 5px solid #ff3cac;
+  background: linear-gradient(90deg, #0a1026 60%, #ff3cac33 100%);
+}
+.menu-item-neon .menu-icon {
+  color: #ff3cac !important;
+  text-shadow: 0 0 8px #ff3cac88;
+}
+.menu-item-neon.active .menu-link {
+  border-left: 5px solid #39ff14;
+  background: linear-gradient(90deg, #39ff14 20%, #00c3ff 80%);
+  color: #0a1026 !important;
 }

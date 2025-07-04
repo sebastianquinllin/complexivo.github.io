@@ -8,90 +8,110 @@
   <!-- 🔊 Contenedor Superior: Sonidos y Modos -->
   <div class="mb-4 border p-3 rounded">
     <div class="row">
-      
       <!-- Columna Izquierda: Hamaca + Originales -->
       <div class="col-md-6 border-end">
         <!-- Sonidos Hamaca -->
         <div class="mb-3">
           <h4 class="text-center">Sonidos Hamaca</h4>
           <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="pato">🦆 Pato</button>
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="perro">🐶 Perro</button>
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="vaca">🐮 Vaca</button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="pato"
+              onclick="enviarComandoMQTT('hamaca/sound/cuac/control', '1')">🦆 Pato</button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="perro"
+              onclick="enviarComandoMQTT('hamaca/sound/perro/control', '1')">🐶 Perro</button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_amaca" data-id="vaca"
+              onclick="enviarComandoMQTT('hamaca/sound/vaca/control', '1')">🐮 Vaca</button>
           </div>
         </div>
-        
         <!-- Modos Originales -->
         <div>
           <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-danger toggle-btn" data-id="reposo_on">🎵 Reposo</button>
-            <button class="btn btn-danger toggle-btn" data-id="movimiento_on">🎶 Movimiento</button>
+            <button class="btn btn-danger toggle-btn" data-id="reposo_on"
+              onclick="enviarComandoMQTT('hamaca/sound/descanso/control', this.classList.contains('btn-success') ? '0' : '1')">🎵 Reposo</button>
+            <button class="btn btn-danger toggle-btn" data-id="movimiento_on"
+              onclick="enviarComandoMQTT('hamaca/sound/movimiento/control', this.classList.contains('btn-success') ? '0' : '1')">🎶 Movimiento</button>
           </div>
         </div>
       </div>
-      
+
       <!-- Columna Derecha: Silla + Alternativas -->
       <div class="col-md-6">
         <!-- Sonidos Silla -->
         <div class="mb-3">
           <h4 class="text-center">Sonidos Silla</h4>
           <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="pato_silla">🦆 Pato </button>
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="perro_silla">🐶 Perro </button>
-            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="vaca_silla">🐮 Vaca </button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="pato_silla"
+              onclick="enviarComandoMQTT('silla/sound/cuac/control', '1')">🦆 Pato</button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="perro_silla"
+              onclick="enviarComandoMQTT('silla/sound/perro/control', '1')">🐶 Perro</button>
+            <button class="btn btn-danger exclusivo-btn" data-group="animal_silla" data-id="vaca_silla"
+              onclick="enviarComandoMQTT('silla/sound/vaca/control', '1')">🐮 Vaca</button>
           </div>
         </div>
-        
         <!-- Modos Alternativos -->
         <div>
           <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-danger toggle-btn" data-id="musica_amaca">🎵 Reposo</button>
-            <button class="btn btn-danger toggle-btn" data-id="musica_silla">🎶 Movimiento</button>
+            <button class="btn btn-danger toggle-btn" data-id="musica_amaca"
+              onclick="enviarComandoMQTT('silla/sound/descanso/control', this.classList.contains('btn-success') ? '0' : '1')">🎵 Reposo</button>
+            <button class="btn btn-danger toggle-btn" data-id="musica_silla"
+              onclick="enviarComandoMQTT('silla/sound/movimiento/control', this.classList.contains('btn-success') ? '0' : '1')">🎶 Movimiento</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 🔊 Contenedor Volumen (debajo) -->
+  <!-- 🔊 Contenedor Volumen -->
   <div class="mb-4 border p-3 rounded">
     <h4 class="text-center mb-3">🔊 Control de Volumen</h4>
     <div class="text-center">
-      <input type="range" id="volumen_musica" min="0" max="100" value="50" class="form-range w-50 mx-auto">
+      <input type="range" id="volumen_musica" min="0" max="100" value="50" class="form-range w-50 mx-auto"
+        oninput="controlarVolumen(this.value)">
       <label for="volumen_musica" class="d-block mt-2">Ajuste de volumen principal</label>
     </div>
   </div>
 
-  <!-- 🎨 Bloque Luces y Animaciones (se mantiene igual) -->
+  <!-- 🎨 Luces y Animaciones -->
   <div class="mb-4 border p-3 rounded">
     <h4 class="text-center">💡 Luces y Animaciones</h4>
     <div class="text-center mb-3">
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="arcoiris">🌈</button>
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="fuego">🔥</button>
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="ola">🌊</button>
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="teatro">🎭</button>
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="meteoro">🌌</button>
-      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="respiracion">💨</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="arcoiris"
+        onclick="enviarAnimacion('arcoiris')">🌈</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="fuego"
+        onclick="enviarAnimacion('fuego')">🔥</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="ola"
+        onclick="enviarAnimacion('onda')">🌊</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="teatro"
+        onclick="enviarAnimacion('teatro')">🎭</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="meteoro"
+        onclick="enviarAnimacion('meteor')">🌌</button>
+      <button class="btn btn-danger exclusivo-btn" data-group="animacion" data-id="respiracion"
+        onclick="enviarAnimacion('respiracion')">💨</button>
     </div>
 
     <div class="text-center mb-3">
       <label for="intensidad_luz">💡 Intensidad Luz</label>
-      <input type="range" id="intensidad_luz" min="0" max="100" value="50" class="form-range" style="width: 250px;">
+      <input type="range" id="intensidad_luz" min="0" max="100" value="50" class="form-range" style="width: 250px;"
+        oninput="enviarComandoMQTT('/rasp/rgb/brillo', this.value)">
     </div>
 
     <div class="text-center mb-3">
       <label for="velocidad_animacion">🎞️ Velocidad Animación</label>
-      <input type="range" id="velocidad_animacion" min="1" max="100" value="50" class="form-range" style="width: 250px;">
+      <input type="range" id="velocidad_animacion" min="1" max="100" value="50" class="form-range" style="width: 250px;"
+        oninput="enviarComandoMQTT('/rasp/rgb/velocidad', this.value)">
     </div>
 
     <div class="text-center mb-3">
-      <input type="color" id="color_selector" title="Color Luz">
+      <input type="color" id="color_selector" title="Color Luz"
+        onchange="enviarComandoMQTT('/rasp/rgb/color', this.value)">
     </div>
 
     <div class="text-center">
-      <button class="btn btn-danger toggle-btn" data-id="reposo_luz">📄 Luz Reposo</button>
-      <button class="btn btn-danger toggle-btn" data-id="movimiento_luz">🚪 Luz Movimiento</button>
-      <button class="btn btn-danger toggle-btn" data-id="apagar_luces">⛔️ Apagar Luces</button>
+      <button class="btn btn-danger toggle-btn" data-id="reposo_luz"
+        onclick="enviarComandoMQTT('/sistema/apagar_reposo', this.classList.contains('btn-success') ? '0' : '1')">📄 Luz Reposo</button>
+      <button class="btn btn-danger toggle-btn" data-id="movimiento_luz"
+        onclick="enviarComandoMQTT('/sistema/apagar_movimiento', this.classList.contains('btn-success') ? '0' : '1')">🚪 Luz Movimiento</button>
+      <button class="btn btn-danger toggle-btn" data-id="apagar_luces"
+        onclick="enviarComandoMQTT('/sistema/apagar_sistema', this.classList.contains('btn-success') ? '0' : '1')">⛔️ Apagar Luces</button>
     </div>
   </div>
 
@@ -103,53 +123,116 @@
 </div>
 
 <script>
-  const bloquearControles = () => {
-    document.querySelectorAll(".btn, input[type=range], input[type=color]").forEach(e => {
-      if (!e.classList.contains("no-bloquear") && !e.id.includes("btn_")) {
-        e.setAttribute("disabled", true);
+function enviarComandoMQTT(topic, payload) {
+  fetch('/control/mqtt', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ topic, payload })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      alert('Error enviando comando MQTT');
+    }
+  });
+}
+
+// Volumen: controla ambos dispositivos
+function controlarVolumen(valor) {
+  enviarComandoMQTT('silla/volume/control', valor);
+  enviarComandoMQTT('hamaca/volume/control', valor);
+  document.getElementById("volumen_musica").style.accentColor = valor > 80 ? 'red' : 'blue';
+}
+
+// Animaciones: envía a ambos dispositivos y a luces RGB (ajusta según tu lógica)
+function enviarAnimacion(anim) {
+  enviarComandoMQTT('/rasp/rgb/animacion', anim);
+}
+
+// ---- LOGICA VISUAL BOTONES (puedes ajustar, esto solo es UI, no MQTT) ----
+const bloquearControles = () => {
+  document.querySelectorAll(".btn, input[type=range], input[type=color]").forEach(e => {
+    if (!e.classList.contains("no-bloquear") && !e.id.includes("btn_")) {
+      e.setAttribute("disabled", true);
+    }
+  });
+  document.getElementById("btn_bloquear").classList.add("d-none");
+  document.getElementById("btn_desbloquear").classList.remove("d-none");
+};
+
+const desbloquearControles = () => {
+  document.querySelectorAll(".btn, input[type=range], input[type=color]").forEach(e => {
+    e.removeAttribute("disabled");
+  });
+  document.getElementById("btn_bloquear").classList.remove("d-none");
+  document.getElementById("btn_desbloquear").classList.add("d-none");
+};
+
+document.getElementById("btn_bloquear").addEventListener("click", bloquearControles);
+document.getElementById("btn_desbloquear").addEventListener("click", desbloquearControles);
+
+// Exclusivos por grupo (visual)
+document.querySelectorAll(".exclusivo-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const group = btn.getAttribute("data-group");
+    document.querySelectorAll(`.exclusivo-btn[data-group='${group}']`).forEach(b => {
+      b.classList.remove("btn-success");
+      b.classList.add("btn-danger");
+    });
+    btn.classList.remove("btn-danger");
+    btn.classList.add("btn-success");
+  });
+});
+
+// Botones ON/OFF independientes (visual)
+document.querySelectorAll(".toggle-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const isActive = btn.classList.contains("btn-success");
+    btn.classList.toggle("btn-success", !isActive);
+    btn.classList.toggle("btn-danger", isActive);
+  });
+});
+
+// -------- POLLING PARA SINCRONIZAR ESTADO REAL --------
+function actualizarEstadoPanel() {
+  fetch('/api/estado-panel')
+    .then(res => res.json())
+    .then(estado => {
+      // Animación activa
+      if (estado.luces.animacion) {
+        document.querySelectorAll('.exclusivo-btn[data-group="animacion"]').forEach(btn => {
+          btn.classList.remove("btn-success");
+          btn.classList.add("btn-danger");
+          if (btn.getAttribute("data-id") === estado.luces.animacion) {
+            btn.classList.remove("btn-danger");
+            btn.classList.add("btn-success");
+          }
+        });
+      }
+      // Intensidad de luz
+      if (typeof estado.luces.intensidad !== "undefined") {
+        document.getElementById("intensidad_luz").value = estado.luces.intensidad;
+      }
+      // Color de luz
+      if (estado.luces.color) {
+        document.getElementById("color_selector").value = estado.luces.color;
+      }
+      // Botones de luz
+      document.querySelector('button[data-id="reposo_luz"]').classList.toggle("btn-success", !!estado.luces.reposo);
+      document.querySelector('button[data-id="reposo_luz"]').classList.toggle("btn-danger", !estado.luces.reposo);
+      document.querySelector('button[data-id="movimiento_luz"]').classList.toggle("btn-success", !!estado.luces.movimiento);
+      document.querySelector('button[data-id="movimiento_luz"]').classList.toggle("btn-danger", !estado.luces.movimiento);
+      document.querySelector('button[data-id="apagar_luces"]').classList.toggle("btn-success", !!estado.luces.apagado);
+      document.querySelector('button[data-id="apagar_luces"]').classList.toggle("btn-danger", !estado.luces.apagado);
+
+      // Volumen música silla (puedes adaptar para hamaca si usas dos sliders)
+      if (estado.musica && typeof estado.musica.silla?.volumen !== "undefined") {
+        document.getElementById("volumen_musica").value = estado.musica.silla.volumen;
+        document.getElementById("volumen_musica").style.accentColor = estado.musica.silla.volumen > 80 ? 'red' : 'blue';
       }
     });
-    document.getElementById("btn_bloquear").classList.add("d-none");
-    document.getElementById("btn_desbloquear").classList.remove("d-none");
-  };
-
-  const desbloquearControles = () => {
-    document.querySelectorAll(".btn, input[type=range], input[type=color]").forEach(e => {
-      e.removeAttribute("disabled");
-    });
-    document.getElementById("btn_bloquear").classList.remove("d-none");
-    document.getElementById("btn_desbloquear").classList.add("d-none");
-  };
-
-  document.getElementById("btn_bloquear").addEventListener("click", bloquearControles);
-  document.getElementById("btn_desbloquear").addEventListener("click", desbloquearControles);
-
-  // Exclusivos por grupo
-  document.querySelectorAll(".exclusivo-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const group = btn.getAttribute("data-group");
-      document.querySelectorAll(`.exclusivo-btn[data-group='${group}']`).forEach(b => {
-        b.classList.remove("btn-success");
-        b.classList.add("btn-danger");
-      });
-      btn.classList.remove("btn-danger");
-      btn.classList.add("btn-success");
-    });
-  });
-
-  // Botones ON/OFF independientes
-  document.querySelectorAll(".toggle-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const isActive = btn.classList.contains("btn-success");
-      btn.classList.toggle("btn-success", !isActive);
-      btn.classList.toggle("btn-danger", isActive);
-    });
-  });
-
-  // Slider color dinámico
-  const volumenMusica = document.getElementById("volumen_musica");
-  volumenMusica.addEventListener("input", () => {
-    volumenMusica.style.accentColor = volumenMusica.value > 80 ? 'red' : 'blue';
-  });
+}
+actualizarEstadoPanel();
+setInterval(actualizarEstadoPanel, 2000);
 </script>
 {% endblock %}

@@ -35,6 +35,27 @@
                 <h1>BIENVENIDO USUARIO</h1>
               </div>
               {% endif %}
+
+              <!-- Contenedor de Silla -->
+              <div class="row justify-content-center my-5">
+                <div class="col-12 mb-4">
+                  <div class="card-imagen-personalizada text-center">
+                    <img src="{{ url_for('static', filename='assets/img/silla.jpg') }}" alt="Silla" class="img-fluid mx-auto d-block" style="max-height: 250px;">
+                    <h3 class="mt-3">Silla Inteligente</h3>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Contenedor de Hamaca -->
+              <div class="row justify-content-center">
+                <div class="col-12 mb-4">
+                  <div class="card-imagen-personalizada text-center">
+                    <img src="{{ url_for('static', filename='assets/img/hamaca.jpg') }}" alt="Hamaca" class="img-fluid mx-auto d-block" style="max-height: 250px;">
+                    <h3 class="mt-3">Hamaca Inteligente</h3>
+                  </div>
+                </div>
+              </div>
+              
               <!--fin del bloque-->
               {% endblock %}
             </div>

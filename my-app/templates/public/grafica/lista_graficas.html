@@ -4,31 +4,33 @@
 
 {% block body %}
 <div class="container mt-5">
-  <h2 class="text-center mb-5">Gráficas del Sistema</h2>
+  <div class="card-neon p-4 mb-5">
+    <h2 class="text-center mb-4" style="color: #fff338; text-shadow: 0 0 8px #ff3cac;">Gráficas del Sistema</h2>
 
-  <!-- Gráfico de Roles -->
-  <div class="row mb-5">
-    <div class="col-md-8 offset-md-2">
-      <div class="card">
-        <div class="card-header text-center">
-          <h5>Distribución de Roles</h5>
-        </div>
-        <div class="card-body">
-          <canvas id="graficaRoles"></canvas>
+    <!-- Gráfico de Roles -->
+    <div class="row mb-5">
+      <div class="col-md-8 offset-md-2">
+        <div class="card-neon">
+          <div class="card-header text-center" style="background: transparent;">
+            <h5 style="color: #39ff14; text-shadow: 0 0 4px #00c3ff;">Distribución de Roles</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="graficaRoles"></canvas>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Gráfico de KPIs -->
-  <div class="row mb-5">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header text-center">
-          <h5>Resumen General del Sistema</h5>
-        </div>
-        <div class="card-body">
-          <canvas id="graficaKPIs"></canvas>
+    <!-- Gráfico de KPIs -->
+    <div class="row mb-5">
+      <div class="col-md-12">
+        <div class="card-neon">
+          <div class="card-header text-center" style="background: transparent;">
+            <h5 style="color: #39ff14; text-shadow: 0 0 4px #00c3ff;">Resumen General del Sistema</h5>
+          </div>
+          <div class="card-body">
+            <canvas id="graficaKPIs"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -39,8 +41,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// Colores reducidos a 3 (puedes agregar más si deseas)
-const coloresGlobales = ['#FF6384', '#36A2EB', '#FFCE56'];
+const coloresGlobales = ['#FF3CAC', '#36A2EB', '#39FF14'];
 
 document.addEventListener('DOMContentLoaded', function () {
   const graficaRolesCanvas = document.getElementById('graficaRoles');
@@ -70,8 +71,8 @@ function renderGraficaRoles() {
       datasets: [{
         data: cantidades,
         backgroundColor: coloresGlobales,
-        borderColor: 'rgba(0,0,0,0.2)',
-        borderWidth: 2
+        borderColor: 'rgba(0,0,0,0.4)',
+        borderWidth: 3
       }]
     },
     options: {
@@ -103,7 +104,7 @@ function renderGraficaKPIs() {
         data: valores,
         backgroundColor: coloresGlobales,
         borderColor: coloresGlobales.map(color => color),
-        borderWidth: 1
+        borderWidth: 2
       }]
     },
     options: {

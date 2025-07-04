@@ -3,55 +3,56 @@
 {% block body %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Análisis por Sesión</h2>
+  <div class="card-neon p-4">
+    <h2 class="text-center mb-4">Análisis por Sesión</h2>
 
-  <!-- Selector de sesión -->
-  <form id="filtro-form" class="mb-4">
-    <div class="row">
-      <div class="col-md-4">
-        <label for="sesionSelect" class="form-label">Seleccione la Sesión:</label>
-        <select id="sesionSelect" class="form-select">
-          <option value="" disabled selected>Seleccione una sesión</option>
-          {% if sesiones %}
-            {% for sesion in sesiones %}
-              <option value="{{ sesion.id_sesion }}">
-                {{ sesion.nombre_sesion }} - {{ sesion.fecha_sesion }}
-              </option>
-            {% endfor %}
-          {% else %}
-            <option disabled>No hay sesiones disponibles</option>
-          {% endif %}
-        </select>
-        <div class="mt-2">
-          <small class="text-muted">Debug: {{ sesiones|length }} sesiones cargadas</small>
+    <!-- Selector de sesión -->
+    <form id="filtro-form" class="mb-4">
+      <div class="row">
+        <div class="col-md-4">
+          <label for="sesionSelect" class="form-label">Seleccione la Sesión:</label>
+          <select id="sesionSelect" class="form-select">
+            <option value="" disabled selected>Seleccione una sesión</option>
+            {% if sesiones %}
+              {% for sesion in sesiones %}
+                <option value="{{ sesion.id_sesion }}">
+                  {{ sesion.nombre_sesion }} - {{ sesion.fecha_sesion }}
+                </option>
+              {% endfor %}
+            {% else %}
+              <option disabled>No hay sesiones disponibles</option>
+            {% endif %}
+          </select>
+          <div class="mt-2">
+            <small class="text-muted">Debug: {{ sesiones|length }} sesiones cargadas</small>
+          </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="button" id="buscarButton" class="btn btn-neon w-100">Buscar</button>
         </div>
       </div>
+    </form>
 
-      <div class="col-md-2 d-flex align-items-end">
-        <button type="button" id="buscarButton" class="btn btn-success w-100">Buscar</button>
-      </div>
+    <!-- Sección de HAMACA -->
+    <h4 class="mt-5">Hamaca</h4>
+    <div class="row g-5">
+      <div class="col-md-6"><canvas id="grafHamacaAngulo"></canvas></div>
+      <div class="col-md-6"><canvas id="grafHamacaAceleracion"></canvas></div>
+      <div class="col-md-6"><canvas id="grafHamacaVelocidad"></canvas></div>
+      <div class="col-md-6"><canvas id="grafHamacaGiros"></canvas></div>
     </div>
-  </form>
 
-  <!-- Sección de HAMACA -->
-  <h4 class="mt-5">Hamaca</h4>
-  <div class="row g-5">
-    <div class="col-md-6"><canvas id="grafHamacaAngulo"></canvas></div>
-    <div class="col-md-6"><canvas id="grafHamacaAceleracion"></canvas></div>
-    <div class="col-md-6"><canvas id="grafHamacaVelocidad"></canvas></div>
-    <div class="col-md-6"><canvas id="grafHamacaGiros"></canvas></div>
-  </div>
-
-  <!-- Sección de SILLA -->
-  <h4 class="mt-5">Silla</h4>
-  <div class="row g-5">
-    <div class="col-md-6"><canvas id="grafSillaAngulo"></canvas></div>
-    <div class="col-md-6"><canvas id="grafSillaAceleracion"></canvas></div>
-    <div class="col-md-6"><canvas id="grafSillaVelocidad"></canvas></div>
-    <div class="col-md-6"><canvas id="grafSillaGiros"></canvas></div>
+    <!-- Sección de SILLA -->
+    <h4 class="mt-5">Silla</h4>
+    <div class="row g-5">
+      <div class="col-md-6"><canvas id="grafSillaAngulo"></canvas></div>
+      <div class="col-md-6"><canvas id="grafSillaAceleracion"></canvas></div>
+      <div class="col-md-6"><canvas id="grafSillaVelocidad"></canvas></div>
+      <div class="col-md-6"><canvas id="grafSillaGiros"></canvas></div>
+    </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>

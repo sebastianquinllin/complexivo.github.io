@@ -4,7 +4,8 @@ from conexion.conexionBD import obtener_conexion
 import openpyxl
 import os
 import datetime
-
+from conexion.conexionFB import *
+from datetime import datetime
 # ================= DASHBOARD KPIs =================
 
 def obtener_kpis_dashboard():
@@ -275,19 +276,6 @@ def listar_sesiones():
     finally:
         conexion.close()
 
-def finalizar_sesion(id_sesion):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    try:
-        cursor.execute("""
-            UPDATE sesiones_terapia
-            SET fecha_fin = NOW(), cerrada = 1
-            WHERE id_sesion = %s
-        """, (id_sesion,))
-        conexion.commit()
-    finally:
-        conexion.close()
-
 def eliminar_sesion(id_sesion):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
@@ -296,7 +284,7 @@ def eliminar_sesion(id_sesion):
         conexion.commit()
     finally:
         conexion.close()
-
+# ================= INFANTES CRUD =====================
 def obtener_infantes():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)

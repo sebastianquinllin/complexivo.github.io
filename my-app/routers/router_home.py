@@ -1,12 +1,13 @@
 from controllers.funciones_login import *
 from controllers.funciones_home import *
+from controllers.mqtt_bridge import *
+from flask import jsonify, session
 from app import app
 from flask import jsonify
 from datetime import datetime, date 
 import re
 from flask import render_template, request, flash, redirect, url_for, session, send_file
-from controllers.mqtt_client import publicar_mensaje
-from controllers.mqtt_client import publicar_mensaje_custom
+
 
 # ===============================================================
 # ======================== USUARIOS =============================
@@ -208,8 +209,6 @@ def lista_de_graficas():
 def nueva_sesion_route():
     if 'id' in session:
         dataLogin = dataLoginSesion()
-
-        # Validar si hay alguna sesión activa
         conexion = obtener_conexion()
         cursor = conexion.cursor(dictionary=True)
         try:
@@ -221,32 +220,27 @@ def nueva_sesion_route():
 
             if request.method == 'POST':
                 id_infante = request.form['id_infante']
-                id_terapeuta = request.form['id_terapeuta']  # Aquí puede haber un campo adicional
-
-                cursor.execute("""
-                    INSERT INTO sesiones_terapia (id_infante, id_terapeuta, fecha_inicio)
-                    VALUES (%s, %s, NOW())
-                """, (id_infante, id_terapeuta))
-                conexion.commit()
-
+                id_terapeuta = request.form['id_terapeuta']
+                # Ahora recibes el session_key generado
+                id_sesion, session_key = crear_nueva_sesion(id_infante, id_terapeuta)
                 flash('Sesión creada e iniciada.', 'success')
                 return redirect(url_for('listar_sesiones_route'))
         finally:
             conexion.close()
 
-        # Obtener los infantes y terapeutas para el formulario
         infantes = obtener_infantes()
         terapeutas = obtener_terapeutas()
-
         return render_template('public/sesiones/formulario_sesion.html',
                                infantes=infantes, terapeutas=terapeutas, dataLogin=dataLogin)
     else:
         return redirect(url_for('inicio'))
 
+
 @app.route("/sesiones/finalizar/<int:id_sesion>", methods=['GET'])
 def finalizar_sesion_route(id_sesion):
     if 'id' in session:
-        finalizar_sesion(id_sesion)
+        session_key = session.get('firebase_session_key')
+        finalizar_sesion(id_sesion, session_key)
         flash('Sesión finalizada.', 'success')
         return redirect(url_for('listar_sesiones_route'))
     else:
@@ -264,28 +258,16 @@ def eliminar_sesion_route(id_sesion):
 # ===============================================================
 # ==================== CONTROL DE SESION EN VIVO (MQTT + DB) ====
 # ===============================================================
-
-@app.route("/sesion/control/<int:id_sesion>", methods=['GET'])
-def control_sesion(id_sesion):
-    if 'id' in session:
-        dataLogin = dataLoginSesion()
-        instrumentos = obtener_instrumentos_por_sesion(id_sesion)
-        return render_template('public/sesiones/control_sesion.html',
-                                instrumentos=instrumentos, id_sesion=id_sesion, dataLogin=dataLogin)
-    else:
+@app.route("/control-sesion/<int:id_sesion>")
+def ver_control_sesion(id_sesion):
+    if 'id' not in session:
         return redirect(url_for('inicio'))
-
-@app.route("/sesion/actualizar_instrumento", methods=['POST'])
-def actualizar_instrumento_estado():
-    if 'id' in session:
-        id_sesion = request.form['id_sesion']
-        id_instrumento = request.form['id_instrumento']
-        estado = int(request.form['estado'])
-        actualizar_estado_instrumento(id_sesion, id_instrumento, estado)
-        publicar_mensaje(id_instrumento, estado)
-        return {"status": "ok"}
-    else:
-        return {"status": "unauthorized"}, 401
+    dataLogin = dataLoginSesion()
+    return render_template(
+        "public/sesiones/control_sesion.html",
+        id_sesion=id_sesion,
+        dataLogin=dataLogin
+    )
 
 # ===============================================================
 # ===================== CONTROL DE INSTRUMENTOS =================

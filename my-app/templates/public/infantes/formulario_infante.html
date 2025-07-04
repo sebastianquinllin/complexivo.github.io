@@ -4,69 +4,71 @@
 
 {% block body %}
 <div class="container mt-5">
-  <h2 class="text-center mb-4">{{ 'Editar Infante' if infante else 'Registrar Nuevo Infante' }}</h2>
+  <div class="card-neon p-4">
+    <h2 class="text-center mb-4">{{ 'Editar Infante' if infante else 'Registrar Nuevo Infante' }}</h2>
 
-  <form method="post" action="{{ url_for('guardar_infante') if not infante else url_for('actualizar_infante', id_infante=infante.id_infante) }}">
+    <form method="post" action="{{ url_for('guardar_infante') if not infante else url_for('actualizar_infante', id_infante=infante.id_infante) }}">
 
-    <!-- Nombre -->
-    <div class="mb-3">
-      <label for="nombre" class="form-label">Nombre del Infante:</label>
-      <input type="text" class="form-control" name="nombre" id="nombre" required value="{{ infante.nombre if infante else '' }}">
-    </div>
+      <!-- Nombre -->
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre del Infante:</label>
+        <input type="text" class="form-control" name="nombre" id="nombre" required value="{{ infante.nombre if infante else '' }}">
+      </div>
 
-    <!-- Apellido -->
-    <div class="mb-3">
-      <label for="apellido" class="form-label">Apellido del Infante:</label>
-      <input type="text" class="form-control" name="apellido" id="apellido" required value="{{ infante.apellido if infante else '' }}">
-    </div>
+      <!-- Apellido -->
+      <div class="mb-3">
+        <label for="apellido" class="form-label">Apellido del Infante:</label>
+        <input type="text" class="form-control" name="apellido" id="apellido" required value="{{ infante.apellido if infante else '' }}">
+      </div>
 
-    <!-- Cédula -->
-    <div class="mb-3">
-      <label for="cedula" class="form-label">Cédula:</label>
-      <input type="text" class="form-control" name="cedula" id="cedula" required pattern="\d{10}" maxlength="10" title="Ingrese una cédula de 10 dígitos" value="{{ infante.cedula if infante else '' }}">
-    </div>
+      <!-- Cédula -->
+      <div class="mb-3">
+        <label for="cedula" class="form-label">Cédula:</label>
+        <input type="text" class="form-control" name="cedula" id="cedula" required pattern="\d{10}" maxlength="10" title="Ingrese una cédula de 10 dígitos" value="{{ infante.cedula if infante else '' }}">
+      </div>
 
-    <!-- Género -->
-    <div class="mb-3">
-      <label for="id_genero" class="form-label">Género:</label>
-      <select name="id_genero" id="id_genero" class="form-select" required>
-        <option value="" disabled selected>Seleccione un género</option>
-        {% for genero in generos %}
-          <option value="{{ genero.id_genero }}" 
-            {% if infante and infante.id_genero == genero.id_genero %} selected {% endif %}>
-            {{ genero.nombre }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
+      <!-- Género -->
+      <div class="mb-3">
+        <label for="id_genero" class="form-label">Género:</label>
+        <select name="id_genero" id="id_genero" class="form-select" required>
+          <option value="" disabled selected>Seleccione un género</option>
+          {% for genero in generos %}
+            <option value="{{ genero.id_genero }}" 
+              {% if infante and infante.id_genero == genero.id_genero %} selected {% endif %}>
+              {{ genero.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <!-- Fecha de nacimiento (sin validación en el input) -->
-    <div class="mb-3">
-      <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento:</label>
-      <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required 
-             value="{{ infante.fecha_nacimiento if infante else '' }}">
-    </div>
+      <!-- Fecha de nacimiento -->
+      <div class="mb-3">
+        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento:</label>
+        <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required 
+               value="{{ infante.fecha_nacimiento if infante else '' }}">
+      </div>
 
-    <!-- Padre -->
-    <div class="mb-3">
-      <label for="id_padre" class="form-label">Padre / Madre:</label>
-      <select name="id_padre" id="id_padre" class="form-select" required>
-        <option value="" disabled selected>Seleccione el padre</option>
-        {% for padre in padres %}
-          <option value="{{ padre.id_usuario }}" 
-            {% if infante and infante.id_padre == padre.id_usuario %} selected {% endif %}>
-            {{ padre.nombre_usuario }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
+      <!-- Padre -->
+      <div class="mb-3">
+        <label for="id_padre" class="form-label">Padre / Madre:</label>
+        <select name="id_padre" id="id_padre" class="form-select" required>
+          <option value="" disabled selected>Seleccione el padre</option>
+          {% for padre in padres %}
+            <option value="{{ padre.id_usuario }}" 
+              {% if infante and infante.id_padre == padre.id_usuario %} selected {% endif %}>
+              {{ padre.nombre_usuario }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <!-- Botones -->
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary">{{ 'Actualizar' if infante else 'Guardar' }}</button>
-      <a href="{{ url_for('listar_infantes_route') }}" class="btn btn-secondary">Cancelar</a>
-    </div>
+      <!-- Botones -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-neon">{{ 'Actualizar' if infante else 'Guardar' }}</button>
+        <a href="{{ url_for('listar_infantes_route') }}" class="btn btn-secondary">Cancelar</a>
+      </div>
 
-  </form>
+    </form>
+  </div>
 </div>
 {% endblock %}

@@ -1,44 +1,47 @@
 {% extends 'public/base_cpanel.html' %}
+
 {% block title %}Gráficas Avanzadas{% endblock %}
 {% block body %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Análisis Avanzado por Sesión e Instrumento</h2>
+  <div class="card-neon p-4">
+    <h2 class="text-center mb-4">Análisis Avanzado por Sesión e Instrumento</h2>
 
-  <!-- Filtro -->
-  <form id="filtro-form" class="row g-3 mb-5">
-    <div class="col-md-4">
-      <label for="infante" class="form-label">Infante:</label>
-      <select id="infante" name="infante" class="form-select" required>
-        <option value="" disabled selected>Seleccione Infante</option>
-        {% for infante in infantes %}
-          <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
-        {% endfor %}
-      </select>
+    <!-- Filtro -->
+    <form id="filtro-form" class="row g-3 mb-5">
+      <div class="col-md-4">
+        <label for="infante" class="form-label">Infante:</label>
+        <select id="infante" name="infante" class="form-select" required>
+          <option value="" disabled selected>Seleccione Infante</option>
+          {% for infante in infantes %}
+            <option value="{{ infante.id_infante }}">{{ infante.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
+        <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" required>
+      </div>
+
+      <div class="col-md-3">
+        <label for="fecha_fin" class="form-label">Fecha Fin:</label>
+        <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" required>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-neon w-100">Filtrar</button>
+      </div>
+    </form>
+
+    <!-- Sin datos -->
+    <div id="mensaje-sin-datos" class="alert alert-warning d-none text-center" role="alert">
+      No se encontraron datos para el infante y rango de fechas seleccionado.
     </div>
 
-    <div class="col-md-3">
-      <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
-      <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" required>
-    </div>
-
-    <div class="col-md-3">
-      <label for="fecha_fin" class="form-label">Fecha Fin:</label>
-      <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" required>
-    </div>
-
-    <div class="col-md-2 d-flex align-items-end">
-      <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-    </div>
-  </form>
-
-  <!-- Sin datos -->
-  <div id="mensaje-sin-datos" class="alert alert-warning d-none text-center" role="alert">
-    No se encontraron datos para el infante y rango de fechas seleccionado.
+    <!-- Contenedor dinámico de gráficas -->
+    <div id="graficas-dinamicas" class="row g-4"></div>
   </div>
-
-  <!-- Contenedor dinámico de gráficas -->
-  <div id="graficas-dinamicas" class="row g-4"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -53,8 +56,8 @@ function renderGraficasPorSesion(sesiones) {
     const card = document.createElement("div");
     card.className = "col-md-6";
     card.innerHTML = `
-      <div class="card">
-        <div class="card-header text-center"><b>${sesion.titulo}</b></div>
+      <div class="card-neon mb-4">
+        <div class="text-center" style="font-weight:bold; color:#fff338; text-shadow:0 0 8px #ff3cac;">${sesion.titulo}</div>
         <div class="card-body">
           <canvas id="${canvasId}"></canvas>
         </div>
@@ -140,5 +143,4 @@ document.getElementById("filtro-form").addEventListener("submit", async function
   }
 });
 </script>
-
 {% endblock %}

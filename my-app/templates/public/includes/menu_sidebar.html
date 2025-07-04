@@ -58,14 +58,6 @@
       </a>
     </li>
 
-    <!-- Reporte de Actividad -->
-    <li class="menu-item {% if request.path == '/reporte-log-actividad' %} active {% endif %}">
-      <a href="/reporte-log-actividad" class="menu-link">
-        <i class="menu-icon bi bi-file-earmark-text"></i>
-        <div>Reporte de Actividad</div>
-      </a>
-    </li>
-
     <!-- Gráficas -->
     <li class="menu-item {% if request.path == '/lista-de-graficas' %} active {% endif %}">
       <a href="/lista-de-graficas" class="menu-link">
@@ -81,6 +73,14 @@
         <div>Gráficas Avanzadas</div>
       </a>
     </li>
+
+    <!-- Reporte de Actividad (NEÓN DESTACADO) -->
+    <li class="menu-item menu-item-neon {% if request.path == '/reporte-log-actividad' %} active {% endif %}">
+      <a href="/reporte-log-actividad" class="menu-link">
+        <i class="menu-icon bi bi-file-earmark-text"></i>
+        <div>Reporte de Actividad</div>
+      </a>
+    </li>    
 
     {% endif %}
 
